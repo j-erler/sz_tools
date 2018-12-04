@@ -4,7 +4,10 @@ Install sz_tools
 ================
 
 sz_tools is a pure Python module and should therefore be pretty easy to install.
-All you'll need is `numpy <http://numpy.scipy.org/>`_ (tested with version 1.14.3).
+In addtion to numpy, sz_tools requires astropy, scipy, healpy and matplotlib in 
+order to work properly. We recommend to use the latest version of 
+`Anaconda <https://www.anaconda.com/download/>`_ python 3.x together with the 
+most recent version of the aforementioned packages.
 
 .. _source:
 
