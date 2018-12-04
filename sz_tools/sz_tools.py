@@ -8,9 +8,9 @@ from scipy.integrate import quad, simps
 from scipy.ndimage.filters import gaussian_filter
 from scipy.misc import derivative
 from scipy.interpolate import make_interp_spline
-import os
+import os.path
 
-path = os.path.dirname( os.path.realpath( __file__ ) )
+datapath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.7255)
 
@@ -27,8 +27,8 @@ H0 = cosmo.H0.value
 I_0 = 2*(k_B*T_CMB)**3/(h*c)**2*1e20
 
 
-
-hdul = fits.open(path + "/data/tsz_tabulated.fits")
+fname1 = os.path.join(datapath, "tsz_tabulated.fits)
+hdul = fits.open(fname1)
 tsz_grid = np.transpose(hdul[0].data)
 hdul.close()
 
@@ -36,7 +36,8 @@ T_e = np.linspace(0,75,760)
 f = np.geomspace(1e10,2.8e12,1000)
 tsz_interpol = interpolate.RectBivariateSpline(f, T_e, tsz_grid, kx=1, ky=1)
 
-data = ascii.read(path + "/data/planck_tsz_tabulated.csv")
+fname2 = os.path.join(datapath, "planck_tsz_tabulated.csv")
+data = ascii.read(fname2)
 tsz_table = {'T_e': np.array(data[:]['T_e']),
             30: np.array(data[:]['LFI_1']),
             44: np.array(data[:]['LFI_2']),
