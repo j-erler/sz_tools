@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# PyMF documentation build configuration file, created by
+# sz_tools documentation build configuration file, created by
 # sphinx-quickstart on Fri Sep 14 13:06:27 2018.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -36,15 +36,15 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = u'pymf'
+project = u'sz_tools'
 copyright = u' 2018 Jens Erler & contributors'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 #
 # The short X.Y version.
-import pymf
-version = pymf.__version__
+import sz_tools
+version = sz_tools.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -151,7 +151,7 @@ html_additional_pages = {
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pymfdoc'
+htmlhelp_basename = 'sz_toolsdoc'
 
 
 # Options for LaTeX output
@@ -166,7 +166,7 @@ htmlhelp_basename = 'pymfdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'pymf.tex', u'PyMF Documentation',
+  ('index', 'sz_tools.tex', u'sz_tools Documentation',
    u'', 'manual'),
 ]
 
