@@ -28,7 +28,7 @@ I_0 = 2*(k_B*T_CMB)**3/(h*c)**2*1e20
 
 
 
-hdul = fits.open(path + "../data/tsz_tabulated.fits")
+hdul = fits.open(path + "/data/tsz_tabulated.fits")
 tsz_grid = np.transpose(hdul[0].data)
 hdul.close()
 
@@ -36,7 +36,7 @@ T_e = np.linspace(0,75,760)
 f = np.geomspace(1e10,2.8e12,1000)
 tsz_interpol = interpolate.RectBivariateSpline(f, T_e, tsz_grid, kx=1, ky=1)
 
-data = ascii.read(path + "../data/planck_tsz_tabulated.csv")
+data = ascii.read(path + "/data/planck_tsz_tabulated.csv")
 tsz_table = {'T_e': np.array(data[:]['T_e']),
             30: np.array(data[:]['LFI_1']),
             44: np.array(data[:]['LFI_2']),
