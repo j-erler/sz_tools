@@ -1,5 +1,5 @@
 sz_tools
-========
+=========
 
 **sz_tools** is a collection of codes that are useful for studies of SZ-effect data e.g. from 
 Planck, as well as general studies of galaxy clusters. Among its features are SED computation, 
