@@ -1,5 +1,5 @@
-PyMF license
-============
+sz_tools license
+================
 
 The MIT License (MIT)
 
