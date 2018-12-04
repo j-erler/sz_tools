@@ -29,7 +29,7 @@ The BibTeX entry for the paper is::
 	@ARTICLE{2018MNRAS.476.3360E,
 		author = {{Erler}, J. and {Basu}, K. and {Chluba}, J. and {Bertoldi}, F.},
 		 title = "{Planck's view on the spectrum of the Sunyaev-Zeldovich effect}",
-	  journal = {\mnras},
+	       journal = {\mnras},
 		  year = 2018,
 		volume = 476,
 		 pages = {3360-3381},
