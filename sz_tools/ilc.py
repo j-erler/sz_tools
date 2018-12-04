@@ -6,9 +6,9 @@ from astropy.io import fits
 from astropy.io import ascii
 from scipy import ndimage
 import sz_tools as sz
-import os
+import os.path
 
-path = os.path.dirname( os.path.realpath( __file__ ) )
+datapath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 fwhm2sigma = 1/(2*np.sqrt(2*np.log(2)))
 
@@ -48,7 +48,8 @@ ring2_maps = {30:  'LFI_SkyMap_030_1024_R2.00_full-ringhalf-2.fits',
               545: 'HFI_SkyMap_545_2048_R2.00_full-ringhalf-2.fits',
               857: 'HFI_SkyMap_857_2048_R2.00_full-ringhalf-2.fits'}
 
-data = ascii.read(path + "/data/NILC_bands.txt")
+fname = os.path.join(datapath, "NILC_bands.txt")
+data = ascii.read(fname)
 NILC_bands = np.array([data[:]['col1'], 
                        data[:]['col2'],
                        data[:]['col3'],
