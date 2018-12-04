@@ -1,0 +1,9 @@
+numpy
+numpydoc
+healpy
+os.path
+datetime
+astropy
+scipy
+os
+matplotlib
