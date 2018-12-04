@@ -48,7 +48,7 @@ ring2_maps = {30:  'LFI_SkyMap_030_1024_R2.00_full-ringhalf-2.fits',
               545: 'HFI_SkyMap_545_2048_R2.00_full-ringhalf-2.fits',
               857: 'HFI_SkyMap_857_2048_R2.00_full-ringhalf-2.fits'}
 
-data = ascii.read(path + "../data/NILC_bands.txt")
+data = ascii.read(path + "/data/NILC_bands.txt")
 NILC_bands = np.array([data[:]['col1'], 
                        data[:]['col2'],
                        data[:]['col3'],
