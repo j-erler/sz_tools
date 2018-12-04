@@ -27,7 +27,7 @@ H0 = cosmo.H0.value
 I_0 = 2*(k_B*T_CMB)**3/(h*c)**2*1e20
 
 
-fname1 = os.path.join(datapath, "tsz_tabulated.fits)
+fname1 = os.path.join(datapath, "tsz_tabulated.fits")
 hdul = fits.open(fname1)
 tsz_grid = np.transpose(hdul[0].data)
 hdul.close()
