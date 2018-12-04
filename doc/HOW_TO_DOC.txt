@@ -21,6 +21,6 @@ a new one is created:
 
 The documentation of the master branch is also available at readthedoc :
 
-    https://pymf.readthedocs.io/
+    https://sz_tools.readthedocs.io/
 
 It is rebuild from the master branch at each commit (so it is always the latest version). 
