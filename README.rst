@@ -22,7 +22,7 @@ Acknowledgement
 ---------------
 
 Please cite `Erler, Basu, Chluba & Bertoldi (2018)
-<https://arxiv.org/abs/1809.06446>`_ if you find the ILC implementation that is 
+<https://doi.org/10.1093/mnras/sty327>`_ if you find the ILC implementation that is 
 part of sz_tools useful in your research.
 The BibTeX entry for the paper is::
 
