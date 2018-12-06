@@ -8,6 +8,7 @@ from scipy.integrate import quad, simps
 from scipy.ndimage.filters import gaussian_filter
 from scipy.misc import derivative
 from scipy.interpolate import make_interp_spline
+from scipy.optimize import bisect
 import os.path
 
 datapath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -1261,3 +1262,54 @@ def Y_500_planck(M_500, z, alpha=1.79, beta=0.66, Y_star=-0.19, b=0.2):
 	Y_500 = 10**Y_star * (0.7/0.7)**(-2+alpha) * ((1-b)*M_500/6e14)**alpha * h_z**(beta) * 1e-4
 
 	return(Y_500)
+
+
+def r200r500(c, delta = 500):
+	'''Computes the ratio of r_200 over another cluster fiducial radius
+	(e.g. r_500) assuming an NFW profile withr a given concentration 
+	parameter c.
+
+	Parameters
+	----------
+	c: float
+		Concentration parameter
+	delta: float
+		Average overdensity within a sphere with the radius of interest.
+		Default: 500
+
+	Returns
+	-------
+	ratio: float
+		Ratio r_200 / r_x
+	'''    
+
+	rho_0 = 200/3.*c**3./(np.log(1+c)-c/(1+c))
+	r_x = bisect(lambda r_x: rho_0*(np.log((1+r_x))-r_x/(1+r_x))/r_x**3 - (delta/3.), 0.1, 100)
+	ratio = c/r_x
+
+	return(ratio)
+
+
+def m200m500(c, delta = 500):
+	'''Computes the ratio of M_200 over another cluster fiducial mass
+	(e.g. M_500) assuming an NFW profile withr a given concentration 
+	parameter c.
+
+	Parameters
+	----------
+	c: float
+		Concentration parameter
+	delta: float
+		Average overdensity within a sphere with the radius of interest.
+		Default: 500
+
+	Returns
+	-------
+	ratio: float
+		Ratio M_200 / M_x
+	'''
+
+	r_200 = r200r500(c, delta = delta)
+	ratio = (200*r_200**3)/(delta)
+
+	return(ratio)
