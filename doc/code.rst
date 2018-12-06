@@ -35,6 +35,8 @@ clusters: general
    Y_500_planck
    Y_500_sph
    Y_500_cyl
+   r200r500
+   m200m500
 
 clusters: pressure and temperature profiles
 -------------------------------------------
