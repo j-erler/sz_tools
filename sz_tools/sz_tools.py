@@ -1280,12 +1280,12 @@ def r200r500(c, delta = 500):
 	Returns
 	-------
 	ratio: float
-		Ratio r_200 / r_x
+		Ratio r_200 / r_delta
 	'''    
 
 	rho_0 = 200/3.*c**3./(np.log(1+c)-c/(1+c))
-	r_x = bisect(lambda r_x: rho_0*(np.log((1+r_x))-r_x/(1+r_x))/r_x**3 - (delta/3.), 0.1, 100)
-	ratio = c/r_x
+	r_delta = bisect(lambda r_x: rho_0*(np.log((1+r_x))-r_x/(1+r_x))/r_x**3 - (delta/3.), 0.1, 100)
+	ratio = c/r_delta
 
 	return(ratio)
 
@@ -1306,7 +1306,7 @@ def m200m500(c, delta = 500):
 	Returns
 	-------
 	ratio: float
-		Ratio M_200 / M_x
+		Ratio M_200 / M_delta
 	'''
 
 	r_200 = r200r500(c, delta = delta)
