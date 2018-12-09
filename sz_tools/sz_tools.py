@@ -324,7 +324,7 @@ def beta_projected(r, A_0, core_radius, beta = 1, xray = False):
 	return(n_e)
 
 
-def gnfw(r, z, M_500, p = 'Arnaud', xx = None, yy = None):
+def gnfw(r, z, M_500, p = 'Arnaud', alpha_p_prime = False, xx = None, yy = None):
 	'''Computes the radial 3D electron pressure profile of 
 	a galaxy cluster using a GNFW model (Nagai et al. 2007)
 
@@ -343,9 +343,11 @@ def gnfw(r, z, M_500, p = 'Arnaud', xx = None, yy = None):
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
-	xray: bool, optional
-		If set to True, projected squared electron number 
-		density profile will be returned. Default: False
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False
 	xx: float or float array
 		x-coordinate. Used for projection only. Default: None
 	yy: float or float array
@@ -374,8 +376,11 @@ def gnfw(r, z, M_500, p = 'Arnaud', xx = None, yy = None):
 
 	px = P_0/((c_500*x)**gamma*(1+(c_500*x)**alpha)**((beta-gamma)/alpha))
 
-	alpha_p_prime = 0.1-(0.12+0.10)*((x/0.5)**3./(1+(x/0.5)**3.))
-
+	if alpha_p_prime is True:
+		alpha_p_prime = 0.1-(0.12+0.10)*((x/0.5)**3./(1+(x/0.5)**3.))
+	else:
+		alpha_p_prime = 0
+	
 	Pnorm = 1.65e-3 * (h_z/h)**(8./3.) * ((M_500) /(3e14*(h/0.7)**(-1.0)))**(2/3.+0.12+alpha_p_prime) * (h/0.7)**2.0
 
 	pressure = Pnorm * px * 1e9 * e
@@ -383,7 +388,8 @@ def gnfw(r, z, M_500, p = 'Arnaud', xx = None, yy = None):
 	return(pressure)
 
 
-def gnfw_projected(r, z, M_500, p = "Arnaud", r_max = 5.0, norm_planck = False):
+def gnfw_projected(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5.0, 
+		   norm_planck = False):
 	'''Computes the radial Compton-y profile of a galaxy cluster 
 	by numerically projecting a GNFW electron pressure model.
 	(Nagai et al. 2007)
@@ -403,6 +409,11 @@ def gnfw_projected(r, z, M_500, p = "Arnaud", r_max = 5.0, norm_planck = False):
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	r_max: float, optional
 		Cluster radius in units of r_500. Determines the line 
 		of sight extent used during the projection. Default: 5.0
@@ -421,7 +432,7 @@ def gnfw_projected(r, z, M_500, p = "Arnaud", r_max = 5.0, norm_planck = False):
 	compton = []
 	for x in r:
 		if x <= r_max*r_500:
-			integral = quad(lambda y: gnfw(None, z, M_500, p, x, y), 0, np.sqrt((r_max*r_500)**2-x**2))
+			integral = quad(lambda y: gnfw(None, z, M_500, p, alpha_p_prime = alpha_p_prime, x, y), 0, np.sqrt((r_max*r_500)**2-x**2))
 			compton.append(thomson/m_e/c**2 * 2*integral[0])
 		else:
 			compton.append(0)
@@ -434,8 +445,8 @@ def gnfw_projected(r, z, M_500, p = "Arnaud", r_max = 5.0, norm_planck = False):
 	return(compton)
 	
 	
-def gnfw_projected_fast(r, z, M_500, p = "Arnaud", r_max = 5.0, r_min = 1e-3, 
-bins = 1000, norm_planck = False):
+def gnfw_projected_fast(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5.0, 
+			r_min = 1e-3, bins = 1000, norm_planck = False):
 	'''Computes the radial Compton-y profile of a galaxy cluster 
 	by numerically projecting a GNFW electron pressure model
 	(Nagai et al. 2007). This function uses faster tabulated 
@@ -457,6 +468,11 @@ bins = 1000, norm_planck = False):
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	r_max: float, optional
 		Cluster radius in units of r_500. Determines the line 
 		of sight extent used during the projection. Default: 5.0
@@ -491,7 +507,7 @@ bins = 1000, norm_planck = False):
 				x_min = 0 
 			x = np.linspace(x_min,np.sqrt(r_max**2-yy**2),bins)
 			r = np.sqrt(yy**2. + x**2.) * r_500
-			integrant = gnfw(r, z, M_500, p)
+			integrant = gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)
 			result = 2*thomson/m_e/c**2 * simps(integrant, x*r_500)
 		else:
 			result = 0
@@ -506,7 +522,8 @@ bins = 1000, norm_planck = False):
 	return(compton)
 
 
-def gnfw_abel(r, z, M_500, p = "Arnaud", r_max = 5.0, norm_planck = False):
+def gnfw_abel(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5.0, 
+	      norm_planck = False):
 	'''Computes the radial Compton-y profile of a galaxy 
 	cluster by numerically projecting a GNFW electron 
 	pressure model (Nagai et al. 2007).
@@ -526,6 +543,11 @@ def gnfw_abel(r, z, M_500, p = "Arnaud", r_max = 5.0, norm_planck = False):
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	r_max: float, optional
 		Cluster radius in units of r_500. Determines the line 
 		of sight extent used during the projection. Default: 5.0
@@ -544,7 +566,7 @@ def gnfw_abel(r, z, M_500, p = "Arnaud", r_max = 5.0, norm_planck = False):
 	compton = []
 	for x in r:
 		if x <= r_max*r_500:
-		    integral = quad(lambda rr: gnfw(rr, z, M_500, p)*rr / np.sqrt(rr**2 - x**2), x, r_max*r_500)
+		    integral = quad(lambda rr: gnfw(rr, z, M_500, p, alpha_p_prime = alpha_p_prime)*rr / np.sqrt(rr**2 - x**2), x, r_max*r_500)
 		    compton.append(thomson/m_e/c**2 * 2*integral[0])
 		else:
 		    compton.append(0)
@@ -557,8 +579,9 @@ def gnfw_abel(r, z, M_500, p = "Arnaud", r_max = 5.0, norm_planck = False):
 	return(compton)
 
 
-def simulate_cluster(M_500, z, p = "Arnaud", map_size = 10, pixel_size = 1.5, dx = 0, dy = 0, 
-interpol = 1000, fwhm = None, r_max = 5.0, r_min = 1e-3, bins = 1000, norm_planck = False):
+def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 10, 
+		     pixel_size = 1.5, dx = 0, dy = 0, interpol = 1000, fwhm = None, 
+		     r_max = 5.0, r_min = 1e-3, bins = 1000, norm_planck = False):
 	'''Computes a Compton-y map of a galaxy cluster at with mass
 	M_500 at redshift z by numerically projecting a GNFW 
 	electron pressure model.
@@ -576,6 +599,11 @@ interpol = 1000, fwhm = None, r_max = 5.0, r_min = 1e-3, bins = 1000, norm_planc
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	map_size: int, optional
 		Size of the map in degrees. Default: 10
 	pixel_size: float, optional
@@ -626,10 +654,10 @@ interpol = 1000, fwhm = None, r_max = 5.0, r_min = 1e-3, bins = 1000, norm_planc
 
 	if interpol is not None:
 		r_interpol = np.linspace(np.min(r), np.max(r), interpol)
-		y_interpol = gnfw_projected_fast(r_interpol, z, M_500, p, r_max, r_min, bins, norm_planck = norm_planck)
+		y_interpol = gnfw_projected_fast(r_interpol, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, norm_planck = norm_planck)
 		cluster_map = np.interp(r, r_interpol, y_interpol)
 	else:
-		cluster_map = gnfw_projected_fast(r, z, M_500, p, r_max, r_min, bins, norm_planck = norm_planck)	
+		cluster_map = gnfw_projected_fast(r, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, norm_planck = norm_planck)	
 
 	cluster_map = cluster_map.reshape(npix,npix)
 
@@ -732,7 +760,8 @@ def deproject(yy, func, compton=True, bins = 10**6):
 	return(yy[:-1], result)	
 
 
-def Y_500_sph(M_500, z, p="Arnaud", r_max = 1.0, r_min = 0.0, arcmin = False):
+def Y_500_sph(M_500, z, p="Arnaud", alpha_p_prime = False, r_max = 1.0, 
+	      r_min = 0.0, arcmin = False):
 	'''Computes the Comptonizaton parameter integrated in a sphere
 	of radius r_max using a GNFW model.
 
@@ -749,6 +778,11 @@ def Y_500_sph(M_500, z, p="Arnaud", r_max = 1.0, r_min = 0.0, arcmin = False):
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	r_max: float, optional
 		Upper bound for the cluster radius in units of r_500. 
 		Default: 1.0
@@ -769,7 +803,7 @@ def Y_500_sph(M_500, z, p="Arnaud", r_max = 1.0, r_min = 0.0, arcmin = False):
 	'''
 
 	r_500 = m500_2_r500(M_500, z, factor = 500) * 1e6 * pc
-	integral = 4*np.pi*quad(lambda r: (gnfw(r, z, M_500, p)*r*r), r_min*r_500, r_max*r_500)[0]
+	integral = 4*np.pi*quad(lambda r: (gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)*r*r), r_min*r_500, r_max*r_500)[0]
 
 	if arcmin is True:
 		DA = cosmo.angular_diameter_distance(z).si.value
@@ -782,7 +816,8 @@ def Y_500_sph(M_500, z, p="Arnaud", r_max = 1.0, r_min = 0.0, arcmin = False):
 	return(Y_500)
 
 
-def Y_500_cyl(M_500, z, R, p="Arnaud", r_max = 5.0, r_min = 0.0, arcmin = False):
+def Y_500_cyl(M_500, z, R, p="Arnaud", alpha_p_prime = False, r_max = 5.0, 
+	      r_min = 0.0, arcmin = False):
 	'''Computes the Comptonizaton parameter integrated in a 
 	cylindrical aperture of radius r_max using a GNFW model.
 
@@ -802,6 +837,11 @@ def Y_500_cyl(M_500, z, R, p="Arnaud", r_max = 5.0, r_min = 0.0, arcmin = False)
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	r_max: float, optional
 		Cluster radius in units of r_500. Determines the line 
 		of sight extent used during the integration. Default: 5.0
@@ -825,7 +865,7 @@ def Y_500_cyl(M_500, z, R, p="Arnaud", r_max = 5.0, r_min = 0.0, arcmin = False)
 
 	r_500 = m500_2_r500(M_500, z, factor = 500) * 1e6 * pc
 
-	integral = 4*np.pi*quad(lambda r: (gnfw(r, z, M_500, p)*r*np.sqrt(r**2-(R*r_500)**2)), R*r_500, r_max*r_500)[0]
+	integral = 4*np.pi*quad(lambda r: (gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)*r*np.sqrt(r**2-(R*r_500)**2)), R*r_500, r_max*r_500)[0]
 
 	if arcmin is True:
 		DA = cosmo.angular_diameter_distance(z).si.value
@@ -888,7 +928,8 @@ def T_e_profile(r, z, M_500, xx = None, yy = None, cool_core = True):
 	return(T)
 
 
-def T_sz(r, z, M_500, p = "Arnaud", r_max = 5, cool_core = True, norm_planck = False):
+def T_sz(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5, 
+	 cool_core = True, norm_planck = False):
 	'''Computes the radial 2D pressure-weighted electron temperatue 
 	profile of a galaxy cluster using the 3D tempeature modele 
 	presented by Vikhlinin et al. (2006) and the 3D pressure 
@@ -915,6 +956,11 @@ def T_sz(r, z, M_500, p = "Arnaud", r_max = 5, cool_core = True, norm_planck = F
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	r_max: float, optional
 		Cluster radius in units of r_500. Determines the line 
 		of sight extent used during the projection. Default: 5.0
@@ -940,8 +986,8 @@ def T_sz(r, z, M_500, p = "Arnaud", r_max = 5, cool_core = True, norm_planck = F
 	temp = []
 	for x in r:
 		if x <= r_max*r_500:
-			nom = quad(lambda y: gnfw(None, z, M_500, p, x, y)*T_e_profile(None, z, M_500, x, y, cool_core = cool_core), 0, np.sqrt((r_max*r_500)**2-x**2))[0]
-			denom = quad(lambda y: gnfw(None, z, M_500, p, x, y), 0, np.sqrt((r_max*r_500)**2-x**2))[0]
+			nom = quad(lambda y: gnfw(None, z, M_500, p, alpha_p_prime = alpha_p_prime, x, y)*T_e_profile(None, z, M_500, x, y, cool_core = cool_core), 0, np.sqrt((r_max*r_500)**2-x**2))[0]
+			denom = quad(lambda y: gnfw(None, z, M_500, p, alpha_p_prime = alpha_p_prime, x, y), 0, np.sqrt((r_max*r_500)**2-x**2))[0]
 			temp.append(nom/denom)
 		else:
 			temp.append(0)
@@ -949,7 +995,8 @@ def T_sz(r, z, M_500, p = "Arnaud", r_max = 5, cool_core = True, norm_planck = F
 
 
 
-def T_sz_fast(r, z, M_500, p = "Arnaud", r_max = 5, r_min = 1e-3, bins = 1000, cool_core = True, norm_planck = False):
+def T_sz_fast(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5, r_min = 1e-3, 
+	      bins = 1000, cool_core = True, norm_planck = False):
 	'''Computes the radial 2D pressure-weighted electron temperatue 
 	profile of a galaxy cluster using the 3D tempeature modele 
 	presented by Vikhlinin et al. (2006) and the 3D pressure 
@@ -977,6 +1024,11 @@ def T_sz_fast(r, z, M_500, p = "Arnaud", r_max = 5, r_min = 1e-3, bins = 1000, c
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	r_max: float, optional
 		Cluster radius in units of r_500. Determines the line 
 		of sight extent used during the projection. Default: 5.0
@@ -1018,8 +1070,8 @@ def T_sz_fast(r, z, M_500, p = "Arnaud", r_max = 5, r_min = 1e-3, bins = 1000, c
 				x_min = 0 
 			x = np.linspace(x_min,np.sqrt(r_max**2-yy**2),bins)
 			r = np.sqrt(yy**2. + x**2.) * r_500
-			integrant = gnfw(r, z, M_500, p)*T_e_profile(r, z, M_500, cool_core = cool_core)
-			norm = gnfw(r, z, M_500, p)
+			integrant = gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)*T_e_profile(r, z, M_500, cool_core = cool_core)
+			norm = gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)
 			temp.append(simps(integrant, x*r_500) / simps(norm, x*r_500))
 		else:
 			temp.append(0)
@@ -1027,7 +1079,8 @@ def T_sz_fast(r, z, M_500, p = "Arnaud", r_max = 5, r_min = 1e-3, bins = 1000, c
 	return(np.array(temp))
 
 
-def tau_fast(r, z, M_500, p = "Arnaud", r_max = 5, r_min = 1e-3, bins = 1000, cool_core = True, norm_planck = False):
+def tau_fast(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5, r_min = 1e-3, 
+	     bins = 1000, cool_core = True, norm_planck = False):
 	'''Computes the radial 2D integrated profile of the optical depth 
 	of a galaxy cluster using the 3D pressure model given by 
 	Arnaud et al. (2010) and the 3D tempeature modele presented by 
@@ -1051,6 +1104,11 @@ def tau_fast(r, z, M_500, p = "Arnaud", r_max = 5, r_min = 1e-3, bins = 1000, co
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	r_max: float, optional
 		Cluster radius in units of r_500. Determines the line 
 		of sight extent used during the projection. Default: 5.0
@@ -1091,7 +1149,7 @@ def tau_fast(r, z, M_500, p = "Arnaud", r_max = 5, r_min = 1e-3, bins = 1000, co
 				x_min = 0 
 			x = np.linspace(x_min,np.sqrt(r_max**2-yy**2),bins)
 			r = np.sqrt(yy**2. + x**2.) * r_500
-			integrant = gnfw(r, z, M_500, p)/(T_e_profile(r, z, M_500, cool_core = cool_core)*1000*e)
+			integrant = gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)/(T_e_profile(r, z, M_500, cool_core = cool_core)*1000*e)
 			tau.append(2*thomson*simps(integrant, x*r_500))
 		else:
 			tau.append(0)
@@ -1099,8 +1157,9 @@ def tau_fast(r, z, M_500, p = "Arnaud", r_max = 5, r_min = 1e-3, bins = 1000, co
 	return(np.array(tau))
 
 
-def simulate_rel_cluster(M_500, z, p = "Arnaud", map_size = 10, pixel_size = 1.5, dx = 0, dy = 0, interpol = 1000, 
-fwhm = None, r_max = 5, r_min = 1e-3, bins = 1000, cool_core = True, norm_planck = False):
+def simulate_rel_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 10, pixel_size = 1.5, 
+			 dx = 0, dy = 0, interpol = 1000, fwhm = None, r_max = 5, r_min = 1e-3, bins = 1000, 
+			 cool_core = True, norm_planck = False):
 	'''Computes Compton-y, optical depth and pressure-weighted 
 	temperature maps of a galaxy cluster at with mass
 	M_500 at redshift z by numerically projecting and weighting
@@ -1124,6 +1183,11 @@ fwhm = None, r_max = 5, r_min = 1e-3, bins = 1000, cool_core = True, norm_planck
 		or 'Planck', in which case the best-fist parameters
 		from Arnaud et al. (2010) and Planck intermediate 
 		results V (2013) are used. Default: 'Arnaud'
+	alpha_p_prime: bool, optional
+		If set to True, variation of the slope of the power law
+		in the normalization of the pressure profile as defined 
+		in Eq. (9) of Arnaud et al. (2010) is applied. 
+		Default: False		
 	map_size: int, optional
 		Size of the map in degrees. Default: 10
 	pixel_size: float, optional
@@ -1179,9 +1243,9 @@ fwhm = None, r_max = 5, r_min = 1e-3, bins = 1000, cool_core = True, norm_planck
 
 	r_interpol = np.linspace(np.min(r), np.max(r), interpol)
 
-	y_interpol = gnfw_projected_fast(r_interpol, z, M_500, p, r_max, r_min, bins, norm_planck=norm_planck)
-	T_interpol = T_sz_fast(r_interpol, z, M_500, p, r_max, r_min, bins, cool_core = cool_core)
-	tau_interpol = tau_fast(r_interpol, z, M_500, p, r_max, r_min, bins, cool_core = cool_core)
+	y_interpol = gnfw_projected_fast(r_interpol, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, norm_planck=norm_planck)
+	T_interpol = T_sz_fast(r_interpol, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, cool_core = cool_core)
+	tau_interpol = tau_fast(r_interpol, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, cool_core = cool_core)
 	
 	y_map = np.interp(r, r_interpol, y_interpol).reshape(npix,npix)
 	T_map = np.interp(r, r_interpol, T_interpol).reshape(npix,npix)
