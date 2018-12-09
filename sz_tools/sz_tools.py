@@ -432,7 +432,7 @@ def gnfw_projected(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5.0
 	compton = []
 	for x in r:
 		if x <= r_max*r_500:
-			integral = quad(lambda y: gnfw(None, z, M_500, p, alpha_p_prime = alpha_p_prime, x, y), 0, np.sqrt((r_max*r_500)**2-x**2))
+			integral = quad(lambda y: gnfw(None, z, M_500, p, alpha_p_prime=alpha_p_prime, xx=x, yy=y), 0, np.sqrt((r_max*r_500)**2-x**2))
 			compton.append(thomson/m_e/c**2 * 2*integral[0])
 		else:
 			compton.append(0)
@@ -507,7 +507,7 @@ def gnfw_projected_fast(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max 
 				x_min = 0 
 			x = np.linspace(x_min,np.sqrt(r_max**2-yy**2),bins)
 			r = np.sqrt(yy**2. + x**2.) * r_500
-			integrant = gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)
+			integrant = gnfw(r, z, M_500, p, alpha_p_prime=alpha_p_prime)
 			result = 2*thomson/m_e/c**2 * simps(integrant, x*r_500)
 		else:
 			result = 0
@@ -566,7 +566,7 @@ def gnfw_abel(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5.0,
 	compton = []
 	for x in r:
 		if x <= r_max*r_500:
-		    integral = quad(lambda rr: gnfw(rr, z, M_500, p, alpha_p_prime = alpha_p_prime)*rr / np.sqrt(rr**2 - x**2), x, r_max*r_500)
+		    integral = quad(lambda rr: gnfw(rr, z, M_500, p, alpha_p_prime=alpha_p_prime)*rr / np.sqrt(rr**2 - x**2), x, r_max*r_500)
 		    compton.append(thomson/m_e/c**2 * 2*integral[0])
 		else:
 		    compton.append(0)
@@ -654,10 +654,10 @@ def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 1
 
 	if interpol is not None:
 		r_interpol = np.linspace(np.min(r), np.max(r), interpol)
-		y_interpol = gnfw_projected_fast(r_interpol, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, norm_planck = norm_planck)
+		y_interpol = gnfw_projected_fast(r_interpol, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, norm_planck = norm_planck)
 		cluster_map = np.interp(r, r_interpol, y_interpol)
 	else:
-		cluster_map = gnfw_projected_fast(r, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, norm_planck = norm_planck)	
+		cluster_map = gnfw_projected_fast(r, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, norm_planck = norm_planck)	
 
 	cluster_map = cluster_map.reshape(npix,npix)
 
@@ -803,7 +803,7 @@ def Y_500_sph(M_500, z, p="Arnaud", alpha_p_prime = False, r_max = 1.0,
 	'''
 
 	r_500 = m500_2_r500(M_500, z, factor = 500) * 1e6 * pc
-	integral = 4*np.pi*quad(lambda r: (gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)*r*r), r_min*r_500, r_max*r_500)[0]
+	integral = 4*np.pi*quad(lambda r: (gnfw(r, z, M_500, p, alpha_p_prime=alpha_p_prime)*r*r), r_min*r_500, r_max*r_500)[0]
 
 	if arcmin is True:
 		DA = cosmo.angular_diameter_distance(z).si.value
@@ -865,7 +865,7 @@ def Y_500_cyl(M_500, z, R, p="Arnaud", alpha_p_prime = False, r_max = 5.0,
 
 	r_500 = m500_2_r500(M_500, z, factor = 500) * 1e6 * pc
 
-	integral = 4*np.pi*quad(lambda r: (gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)*r*np.sqrt(r**2-(R*r_500)**2)), R*r_500, r_max*r_500)[0]
+	integral = 4*np.pi*quad(lambda r: (gnfw(r, z, M_500, p, alpha_p_prime=alpha_p_prime)*r*np.sqrt(r**2-(R*r_500)**2)), R*r_500, r_max*r_500)[0]
 
 	if arcmin is True:
 		DA = cosmo.angular_diameter_distance(z).si.value
@@ -986,8 +986,8 @@ def T_sz(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5,
 	temp = []
 	for x in r:
 		if x <= r_max*r_500:
-			nom = quad(lambda y: gnfw(None, z, M_500, p, alpha_p_prime = alpha_p_prime, x, y)*T_e_profile(None, z, M_500, x, y, cool_core = cool_core), 0, np.sqrt((r_max*r_500)**2-x**2))[0]
-			denom = quad(lambda y: gnfw(None, z, M_500, p, alpha_p_prime = alpha_p_prime, x, y), 0, np.sqrt((r_max*r_500)**2-x**2))[0]
+			nom = quad(lambda y: gnfw(None, z, M_500, p, alpha_p_prime=alpha_p_prime, xx=x, yy=y)*T_e_profile(None, z, M_500, x, y, cool_core = cool_core), 0, np.sqrt((r_max*r_500)**2-x**2))[0]
+			denom = quad(lambda y: gnfw(None, z, M_500, p, alpha_p_prime=alpha_p_prime, xx=x, yy=y), 0, np.sqrt((r_max*r_500)**2-x**2))[0]
 			temp.append(nom/denom)
 		else:
 			temp.append(0)
@@ -1070,8 +1070,8 @@ def T_sz_fast(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5, r_min
 				x_min = 0 
 			x = np.linspace(x_min,np.sqrt(r_max**2-yy**2),bins)
 			r = np.sqrt(yy**2. + x**2.) * r_500
-			integrant = gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)*T_e_profile(r, z, M_500, cool_core = cool_core)
-			norm = gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)
+			integrant = gnfw(r, z, M_500, p, alpha_p_prime=alpha_p_prime)*T_e_profile(r, z, M_500, cool_core = cool_core)
+			norm = gnfw(r, z, M_500, p, alpha_p_prime=alpha_p_prime)
 			temp.append(simps(integrant, x*r_500) / simps(norm, x*r_500))
 		else:
 			temp.append(0)
@@ -1149,7 +1149,7 @@ def tau_fast(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5, r_min 
 				x_min = 0 
 			x = np.linspace(x_min,np.sqrt(r_max**2-yy**2),bins)
 			r = np.sqrt(yy**2. + x**2.) * r_500
-			integrant = gnfw(r, z, M_500, p, alpha_p_prime = alpha_p_prime)/(T_e_profile(r, z, M_500, cool_core = cool_core)*1000*e)
+			integrant = gnfw(r, z, M_500, p, alpha_p_prime=alpha_p_prime)/(T_e_profile(r, z, M_500, cool_core = cool_core)*1000*e)
 			tau.append(2*thomson*simps(integrant, x*r_500))
 		else:
 			tau.append(0)
@@ -1243,9 +1243,9 @@ def simulate_rel_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size
 
 	r_interpol = np.linspace(np.min(r), np.max(r), interpol)
 
-	y_interpol = gnfw_projected_fast(r_interpol, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, norm_planck=norm_planck)
-	T_interpol = T_sz_fast(r_interpol, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, cool_core = cool_core)
-	tau_interpol = tau_fast(r_interpol, z, M_500, p, alpha_p_prime = alpha_p_prime, r_max, r_min, bins, cool_core = cool_core)
+	y_interpol = gnfw_projected_fast(r_interpol, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, norm_planck=norm_planck)
+	T_interpol = T_sz_fast(r_interpol, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, cool_core = cool_core)
+	tau_interpol = tau_fast(r_interpol, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, cool_core = cool_core)
 	
 	y_map = np.interp(r, r_interpol, y_interpol).reshape(npix,npix)
 	T_map = np.interp(r, r_interpol, T_interpol).reshape(npix,npix)
