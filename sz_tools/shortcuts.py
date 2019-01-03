@@ -361,9 +361,9 @@ def convert_units(freq, values, cmb2mjy=False, mjy2cmb=False, rj2mjy=False, mjy2
 	elif mjy2rj is True:
 		conversion = 1/(1e20 * 2*freq**2.*k_B/c**2.)
 	elif cmb2rj is True:
-		conversion = (k_B*T_CMB/h)**2. * x**4. * exp(x) / (exp(x)-1)**2. / freq**2.
+		conversion = (k_B*T_CMB/h)**2. * x**4. * np.exp(x) / (np.exp(x)-1)**2. / freq**2.
 	elif rj2cmb is True:
-		conversion = 1/((k_B*T_CMB/h)**2. * x**4. * exp(x) / (exp(x)-1)**2. / freq**2.)        
+		conversion = 1/((k_B*T_CMB/h)**2. * x**4. * np.exp(x) / (np.exp(x)-1)**2. / freq**2.)        
 	else:
 		print("Not sure which units are given and what should be returned.")
 
