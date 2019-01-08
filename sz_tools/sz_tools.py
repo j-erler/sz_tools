@@ -34,7 +34,7 @@ tsz_grid = np.transpose(hdul[0].data)
 hdul.close()
 
 T_e = np.linspace(0,75,760)
-f = np.geomspace(1e10,2.8e12,1000)
+f = np.log10(np.geomspace(1e10,2.8e12,1000))
 tsz_interpol = interpolate.RectBivariateSpline(f, T_e, tsz_grid, kx=1, ky=1)
 
 fname2 = os.path.join(datapath, "planck_tsz_tabulated.csv")
@@ -132,7 +132,7 @@ def tsz_spec(nu, y, T_e=0, MJy=False):
 		tsz = y*f_x*h_x*I_0
 
 	else:
-		tsz = y*tsz_interpol(nu, T_e)[:,0]
+		tsz = y*tsz_interpol(np.log10(nu), T_e)[:,0]
 
 	if MJy is False:
 		tsz *= T_CMB/I_0/h_x 
