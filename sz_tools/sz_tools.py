@@ -642,7 +642,7 @@ def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 1
 		Unitless compton-y map of cluster.
 	'''
 
-	npix = int(map_size*60 / pixel_size)
+	npix = round(map_size*60 / pixel_size)
 
 	pixel_size_meters = pixel_size/60*np.pi/180 * cosmo.angular_diameter_distance(z).si.value
 
@@ -702,7 +702,7 @@ def simulate_cluster_beta(y_0, r_c, beta = 1, map_size = 10, pixel_size = 1.5, d
 		Unitless compton-y map of cluster.
 	'''
 
-	npix = int(map_size*60 / pixel_size)
+	npix = round(map_size*60 / pixel_size)
 
 	YY, XX = np.indices((npix, npix))
 	center = (npix//2+dx,npix//2+dy)
@@ -1231,7 +1231,7 @@ def simulate_rel_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size
 		3D array containing the simulated y-map, tau-map and T_SZ-map.
 	'''
 
-	npix = int(map_size*60 / pixel_size)
+	npix = round(map_size*60 / pixel_size)
 
 	pixel_size_meters = pixel_size/60*np.pi/180 * cosmo.angular_diameter_distance(z).si.value
 
