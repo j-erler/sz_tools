@@ -29,6 +29,6 @@ from .sz_tools import (planck_uc, planck_beams, tsz_spec, tsz_spec_planck, ksz_s
 from .shortcuts import (make_table, write_file, read_file, writefits, readfits, hubble, 
                         angular_dist, luminosity_dist, dist, gaussian, create_histogram, 
                         convert_units, mbb_spec, cov2corr, corr2cov, compact_error, quantile, 
-                        find_level)
+                        find_level, angle, radial_profile)
 from .ilc import (create_header, project_maps, ilc_windows, remove_offset, run_ilc, ilc_scales, 
                   ilc, ilc_allsky)

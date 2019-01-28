@@ -560,3 +560,162 @@ def find_level(array, interval = 0.68):
 
 	level = steps[i]
 	return(level)
+
+
+def angle(nx, ny, center=None, rotate = 0, degrees = True):
+	'''Returnes a map of dimensions nx * ny that gives the azimuth angle 
+	of each pixel relative to a given center. The azimuth angle increases 
+	counter-clockwise with the origin at the 12 o'clock position.
+
+	Parameters
+	----------
+	nx: int
+		Number of pixels along the first axis
+	ny: int
+		Number of pixels along the second axis
+	center: float tuple, optional
+		2D coordinates of the center to which the distance is computed. If 
+		set to None, the center of the image (nx//2, ny//2) will be used 
+		Default: None
+	rotate: float, optional
+		Applies a rotation in counter-clockwise direction. Has to be provided 
+		in degrees. Default: 0
+	degrees: bool, optional
+		If True, the azimuth angle is returned in degrees, if False in radians.
+		Default: True
+
+	Returns
+	-------
+	phi: float array
+		2D map containing the azimuth angle relative to center at each pixel.
+	'''
+
+	if center is None:
+		center = (nx//2, ny//2)
+
+	y, x = np.indices((nx,ny))
+	y = y-center[0]
+	x = x-center[1]
+
+	r = np.sqrt(x**2 + y**2)
+	if r.min() == 0:
+		r[center] = np.nan
+
+	phi = np.arcsin(y/r)
+	if r.min() == 0:
+		phi[center] = 0
+
+	phi[x < 0] = np.pi - phi[x < 0] 
+	phi[(y < 0) & (x >= 0)] = 2*np.pi + phi[(y < 0) & (x >= 0)] 
+
+	phi = phi - (rotate+90)*np.pi/180
+	phi[phi < 0] += 2*np.pi
+	if r.min() == 0:
+		phi[center] = 0
+
+	if degrees is True:
+		phi *= 180/np.pi
+
+	return(phi)
+
+
+def radial_profile(image, center = None, nbins = None, r_min = 0, r_max = None, 
+               cone = None, weighted = False, log = False, check = False):
+	'''Computes the radial profile of a map around a given center. The profile 
+	can be computed by azimuthally averaging pixels in a given number of radial
+	bins or by averaging pixels with identical (integer) distance to center. 
+
+	Parameters
+	----------
+	image: 2D float array
+		Image used for the computation of the radial profile
+	center: float tuple, optional
+		2D coordinates of the center to which the distance is computed. If 
+		set to None, the center of the image (nx//2, ny//2) will be used 
+		Default: None
+	nbins: int
+		Number of radial bins. If set to None, pixels with identical (integer) 
+		distance to center will be averaged instead. Default: None
+	r_min: float
+		Inner boundary for radial bins in units of pixel. Default: 0
+	r_max: float
+		Outer boundary for radial bins in units of pixel. If None, r_max will be 
+		computed such that the entire image area is used. Default: None
+	cone: float array
+		Tuple defining the lower and upper azimuth angle that span a cone. Has
+		to be given in degrees. If None, the full circle is used. Default: None
+	weighted: bool
+		If set to True, the x-values of the radial profile will be weighted 
+		with the signal. Otherwise the bin centers are used. Default: False
+	log: bool
+		If set to True, logarithmically spaced bins will be used Default: False
+	check: bool
+		If set to True, an image with identical dimensions to the input will be
+		returned that illustrates the applied radial bins. Useful for debugging.
+		Default: False
+	Returns
+	-------
+	out: float array
+		2D numpy array containing the x and y values of the radial profile.
+	'''
+
+	nx, ny = image.shape[0], image.shape[1]
+
+	if center is None:
+		center = (nx//2, ny//2)
+	if cone is None:
+		cone = np.array([0,360])
+
+	r = sz.dist(nx, ny, center)
+	phi = angle(nx, ny, center[::-1], rotate=cone[0])
+	cone -= cone[0]
+	if cone[1] < 0:
+		cone[1] += 360
+
+	if nbins is not None:
+		
+		profile = np.zeros((2,nbins))
+		control = np.zeros((nx,ny))
+		
+		if r_max is None:
+		    if center[0] > (nx/2):
+		        xrange = nx - center[0]
+		    else:
+		        xrange = center[0]
+		    if center[1] > (ny/2):
+		        yrange = ny - center[1]
+		    else:
+		        yrange = center[1]
+		    r_max = np.sqrt(xrange**2 + yrange**2)
+		
+		if log is False:
+		    bins = np.linspace(r_min,r_max,nbins+1)
+		else:
+		    if r_min == 0:
+		        r_min = 1
+		    bins = np.geomspace(r_min,r_max,nbins+1)
+		
+		for i in np.arange(nbins):
+		    index = (r >= bins[i]) & (r < bins[i+1]) & (phi >= cone[0]) & (phi < cone[1])
+		    signal = image[index]
+		    profile[0,i] = np.sum(signal*r[index])/np.sum(signal)
+		    profile[1,i] = np.mean(signal)
+		    control[index] = i+1
+		    
+		if weighted is not True:
+		    profile[0,:] = (bins[1:] + bins[0:-1])/2
+		    
+		if check is False:
+		    out = profile
+		else:
+		    out = control
+		    
+	else:
+		
+		r = r.astype(np.int)
+		r_uniq = np.unique(r)
+		tbin = np.bincount(r.ravel(), image.ravel())
+		nr = np.bincount(r.ravel())
+		out = np.array([r_uniq, tbin / nr])
+		    
+	return(out)
