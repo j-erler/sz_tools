@@ -100,3 +100,5 @@ wrappers
    gaussian
    create_histogram
    convert_units
+   angle
+   radial_profile
