@@ -861,7 +861,7 @@ def Y_500_cyl(M_500, z, R, p="Arnaud", alpha_p_prime = False, r_max = 5.0,
 
 	'''
 
-	Y_500_spherical = Y_500_sph(M_500, z, p, r_max, r_min, arcmin = arcmin)
+	Y_500_spherical = Y_500_sph(M_500, z, p, r_max=r_max, r_min=r_min, arcmin = arcmin)
 
 	r_500 = m500_2_r500(M_500, z, factor = 500) * 1e6 * pc
 
