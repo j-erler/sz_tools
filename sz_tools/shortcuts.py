@@ -666,7 +666,7 @@ def radial_profile(image, center = None, nbins = None, r_min = 0, r_max = None,
 	if cone is None:
 		cone = np.array([0,360])
 
-	r = sz.dist(nx, ny, center)
+	r = dist(nx, ny, center)
 	phi = angle(nx, ny, center[::-1], rotate=cone[0])
 	cone -= cone[0]
 	if cone[1] < 0:
