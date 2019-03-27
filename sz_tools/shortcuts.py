@@ -674,7 +674,7 @@ def radial_profile(image, center = None, nbins = None, r_min = 0, r_max = None,
 
 	if nbins is not None:
 		
-		profile = np.zeros((2,nbins))
+		profile = np.zeros((3,nbins))
 		control = np.zeros((nx,ny))
 		
 		if r_max is None:
@@ -700,6 +700,8 @@ def radial_profile(image, center = None, nbins = None, r_min = 0, r_max = None,
 		    signal = image[index]
 		    profile[0,i] = np.sum(signal*r[index])/np.sum(signal)
 		    profile[1,i] = np.mean(signal)
+		    profile[2,i] = np.std(signal)
+			
 		    control[index] = i+1
 		    
 		if weighted is not True:
