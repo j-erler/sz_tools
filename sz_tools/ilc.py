@@ -20,7 +20,7 @@ ring2_path = home + "/SSD/Planck_maps/ringhalf_2/"
 
 planck_maps = {30:  'LFI_SkyMap_030_1024_R2.01_full.fits',
                44:  'LFI_SkyMap_033_1024_R2.01_full.fits',
-               70:  'HFI_SkyMap_070_2048_R2.01_full.fits',
+               70:  'LFI_SkyMap_070_2048_R2.01_full.fits',
                100: 'HFI_SkyMap_100_2048_R2.02_full.fits',
                143: 'HFI_SkyMap_143_2048_R2.02_full.fits',
                217: 'HFI_SkyMap_217_2048_R2.02_full.fits',
@@ -722,9 +722,9 @@ def ilc_allsky(allsky_maps = None, freq = None, nside = 2048, planck = None, dec
 			
 			nfields = hp.pixelfunc.nside2npix(field_nside[i])
 			pix_per_field = int(npix/nfields)
-			fields = np.arange(0, nfields) * pix_per_field
+			fields = np.arange(0, nfields+1) * pix_per_field
 
-			for k in np.arange(nfields-1):
+			for k in np.arange(nfields):
 				ilc_result = run_ilc(filtered_maps[:,fields[k]:fields[k+1]], F, e = responce, mask = mask)
 				ilc_result = remove_offset(ilc_result, median = True)	
 				output[fields[k]:fields[k+1]] += ilc_result
@@ -732,9 +732,9 @@ def ilc_allsky(allsky_maps = None, freq = None, nside = 2048, planck = None, dec
 	else:
 		nfields = hp.pixelfunc.nside2npix(field_nside)
 		pix_per_field = int(npix/nfields)
-		fields = np.arange(0, nfields) * pix_per_field
+		fields = np.arange(0, nfields+1) * pix_per_field
 
-		for k in np.arange(nfields-1):
+		for k in np.arange(nfields):
 			ilc_result = run_ilc(allsky_maps[:, fields[k]:fields[k+1]], F, e = responce, mask = mask)
 			ilc_result = remove_offset(ilc_result, median = True)	
 			output[fields[k]:fields[k+1]] += ilc_result
