@@ -372,7 +372,7 @@ def convert_units(freq, values, cmb2mjy=False, mjy2cmb=False, rj2mjy=False, mjy2
 	return(converted_signal)
 
 
-def mbb_spec(freq, A, T, beta, f_0 = 857e9, K_CMB=False, K_RJ=False):
+def mbb_spec(freq, A, T, beta, z = 0, f_0 = 857e9, K_CMB=False, K_RJ=False):
 	'''Computes the flux density of a modified black body in MJy/sr. 
 
 	Parameters
@@ -391,6 +391,8 @@ def mbb_spec(freq, A, T, beta, f_0 = 857e9, K_CMB=False, K_RJ=False):
 		The output will be given in units of K_CMB. Default: False
 	K_RJ: bool, optional
 		The output will be given in units of K_RJ. Default: False
+	z: float
+		Source redshift. Default: 0
 
 	Returns
 	-------
@@ -398,7 +400,7 @@ def mbb_spec(freq, A, T, beta, f_0 = 857e9, K_CMB=False, K_RJ=False):
 		Flux density of a modified black body.
 	'''
 
-	dust = A * (freq/f_0)**(3.+beta) * (np.exp(h*f_0/k_B/T)-1) / (np.exp(h*freq/k_B/T)-1)
+	dust = A * (freq*(1+z)/f_0)**(3.+beta) * (np.exp(h*f_0/k_B/T)-1) / (np.exp(h*freq*(1+z)/k_B/T)-1)
 
 	if K_CMB is True:
 		dust = convert_units(freq, dust, mjy2cmb=True)
