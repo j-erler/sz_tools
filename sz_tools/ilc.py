@@ -1,6 +1,5 @@
 import numpy as np
 import healpy as hp
-from os.path import expanduser
 import datetime
 from astropy.io import fits
 from astropy.io import ascii
@@ -12,41 +11,85 @@ datapath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 fwhm2sigma = 1/(2*np.sqrt(2*np.log(2)))
 
-home = expanduser("~")
 
-planck_path = home + "/SSD/Planck_maps/full_mission/"
-ring1_path = home + "/SSD/Planck_maps/ringhalf_1/"
-ring2_path = home + "/SSD/Planck_maps/ringhalf_2/"
 
-planck_maps = {30:  'LFI_SkyMap_030_1024_R2.01_full.fits',
-               44:  'LFI_SkyMap_033_1024_R2.01_full.fits',
-               70:  'LFI_SkyMap_070_2048_R2.01_full.fits',
-               100: 'HFI_SkyMap_100_2048_R2.02_full.fits',
-               143: 'HFI_SkyMap_143_2048_R2.02_full.fits',
-               217: 'HFI_SkyMap_217_2048_R2.02_full.fits',
-               353: 'HFI_SkyMap_353_2048_R2.02_full.fits',
-               545: 'HFI_SkyMap_545_2048_R2.02_full.fits',
-               857: 'HFI_SkyMap_857_2048_R2.02_full.fits'}
+#paths to Planck maps
 
-ring1_maps = {30:  'LFI_SkyMap_030_1024_R2.00_full-ringhalf-1.fits',
-              44:  'LFI_SkyMap_044_1024_R2.00_full-ringhalf-1.fits',
-              70:  'LFI_SkyMap_070_2048_R2.00_full-ringhalf-1.fits',
-              100: 'HFI_SkyMap_100_2048_R2.00_full-ringhalf-1.fits',
-              143: 'HFI_SkyMap_143_2048_R2.00_full-ringhalf-1.fits',
-              217: 'HFI_SkyMap_217_2048_R2.00_full-ringhalf-1.fits',
-              353: 'HFI_SkyMap_353_2048_R2.00_full-ringhalf-1.fits',
-              545: 'HFI_SkyMap_545_2048_R2.00_full-ringhalf-1.fits',
-              857: 'HFI_SkyMap_857_2048_R2.00_full-ringhalf-1.fits'}
+full_mission_path = "/vol/arc3/data1/sz/Planck_legacy_data/light_maps/"
+ring1_path = "/vol/arc3/data1/sz/Planck_legacy_data/ring1/"
+ring2_path = "/vol/arc3/data1/sz/Planck_legacy_data/ring2/"
+hm1_path = "/vol/arc3/data1/sz/Planck_legacy_data/half_mission_1/"
+hm2_path = "/vol/arc3/data1/sz/Planck_legacy_data/half_mission_2/"
 
-ring2_maps = {30:  'LFI_SkyMap_030_1024_R2.00_full-ringhalf-2.fits',
-              44:  'LFI_SkyMap_044_1024_R2.00_full-ringhalf-2.fits',
-              70:  'LFI_SkyMap_070_2048_R2.00_full-ringhalf-2.fits',
-              100: 'HFI_SkyMap_100_2048_R2.00_full-ringhalf-2.fits',
-              143: 'HFI_SkyMap_143_2048_R2.00_full-ringhalf-2.fits',
-              217: 'HFI_SkyMap_217_2048_R2.00_full-ringhalf-2.fits',
-              353: 'HFI_SkyMap_353_2048_R2.00_full-ringhalf-2.fits',
-              545: 'HFI_SkyMap_545_2048_R2.00_full-ringhalf-2.fits',
-              857: 'HFI_SkyMap_857_2048_R2.00_full-ringhalf-2.fits'}
+full_mission_maps = {30: 'LFI_SkyMap_030-BPassCorrected-field-IQU_1024_R3.00_full.fits',
+               44: 'LFI_SkyMap_044-BPassCorrected-field-IQU_1024_R3.00_full.fits',
+               70: 'LFI_SkyMap_070-BPassCorrected-field-IQU_1024_R3.00_full.fits',
+               100: 'HFI_SkyMap_100-field-IQU_2048_R3.00_full.fits',
+               143: 'HFI_SkyMap_143-field-IQU_2048_R3.00_full.fits',
+               217: 'HFI_SkyMap_217-field-IQU_2048_R3.00_full.fits',
+               353: 'HFI_SkyMap_353-psb-field-IQU_2048_R3.00_full.fits',
+               545: 'HFI_SkyMap_545-field-Int_2048_R3.00_full.fits',
+               857: 'HFI_SkyMap_857-field-Int_2048_R3.00_full.fits'}
+
+ring1_maps = {30: ring1_path+'LFI_SkyMap_030-BPassCorrected_1024_R3.00_full-ringhalf-1.fits',
+              44: ring1_path+'LFI_SkyMap_044-BPassCorrected_1024_R3.00_full-ringhalf-1.fits',
+              70: ring1_path+'LFI_SkyMap_070-BPassCorrected_1024_R3.00_full-ringhalf-1.fits',
+              100: hm1_path+'HFI_SkyMap_100_2048_R3.01_halfmission-1.fits',
+              143: hm1_path+'HFI_SkyMap_143_2048_R3.01_halfmission-1.fits',
+              217: hm1_path+'HFI_SkyMap_217_2048_R3.01_halfmission-1.fits',
+              353: hm1_path+'HFI_SkyMap_353-psb_2048_R3.01_halfmission-1.fits',
+              545: hm1_path+'HFI_SkyMap_545_2048_R3.01_halfmission-1.fits',
+              857: hm1_path+'HFI_SkyMap_857_2048_R3.01_halfmission-1.fits'}
+
+ring2_maps = {30: ring2_path+'LFI_SkyMap_030-BPassCorrected_1024_R3.00_full-ringhalf-2.fits',
+              44: ring2_path+'LFI_SkyMap_044-BPassCorrected_1024_R3.00_full-ringhalf-2.fits',
+              70: ring2_path+'LFI_SkyMap_070-BPassCorrected_1024_R3.00_full-ringhalf-2.fits',
+              100: hm2_path+'HFI_SkyMap_100_2048_R3.01_halfmission-2.fits',
+              143: hm2_path+'HFI_SkyMap_143_2048_R3.01_halfmission-2.fits',
+              217: hm2_path+'HFI_SkyMap_217_2048_R3.01_halfmission-2.fits',
+              353: hm2_path+'HFI_SkyMap_353-psb_2048_R3.01_halfmission-2.fits',
+              545: hm2_path+'HFI_SkyMap_545_2048_R3.01_halfmission-2.fits',
+              857: hm2_path+'HFI_SkyMap_857_2048_R3.01_halfmission-2.fits'}
+
+milca_ymap = "/vol/arc3/data1/sz/Planck_legacy_data/COM_CompMAP_YSZ_R2.02/milca_ymaps.fits"
+nilc_ymap = "/vol/arc3/data1/sz/Planck_legacy_data/COM_CompMAP_YSZ_R2.02/nilc_ymaps.fits" 
+
+#from os.path import expanduser
+#home = expanduser("~")
+
+#planck_path = home + "/SSD/Planck_maps/full_mission/"
+#ring1_path = home + "/SSD/Planck_maps/ringhalf_1/"
+#ring2_path = home + "/SSD/Planck_maps/ringhalf_2/"
+
+#planck_maps = {30:  'LFI_SkyMap_030_1024_R2.01_full.fits',
+#               44:  'LFI_SkyMap_033_1024_R2.01_full.fits',
+#               70:  'LFI_SkyMap_070_2048_R2.01_full.fits',
+#               100: 'HFI_SkyMap_100_2048_R2.02_full.fits',
+#               143: 'HFI_SkyMap_143_2048_R2.02_full.fits',
+#               217: 'HFI_SkyMap_217_2048_R2.02_full.fits',
+#               353: 'HFI_SkyMap_353_2048_R2.02_full.fits',
+#               545: 'HFI_SkyMap_545_2048_R2.02_full.fits',
+#               857: 'HFI_SkyMap_857_2048_R2.02_full.fits'}
+
+#ring1_maps = {30:  'LFI_SkyMap_030_1024_R2.00_full-ringhalf-1.fits',
+#              44:  'LFI_SkyMap_044_1024_R2.00_full-ringhalf-1.fits',
+#              70:  'LFI_SkyMap_070_2048_R2.00_full-ringhalf-1.fits',
+#              100: 'HFI_SkyMap_100_2048_R2.00_full-ringhalf-1.fits',
+#              143: 'HFI_SkyMap_143_2048_R2.00_full-ringhalf-1.fits',
+#              217: 'HFI_SkyMap_217_2048_R2.00_full-ringhalf-1.fits',
+#              353: 'HFI_SkyMap_353_2048_R2.00_full-ringhalf-1.fits',
+#              545: 'HFI_SkyMap_545_2048_R2.00_full-ringhalf-1.fits',
+#              857: 'HFI_SkyMap_857_2048_R2.00_full-ringhalf-1.fits'}
+
+#ring2_maps = {30:  'LFI_SkyMap_030_1024_R2.00_full-ringhalf-2.fits',
+#              44:  'LFI_SkyMap_044_1024_R2.00_full-ringhalf-2.fits',
+#              70:  'LFI_SkyMap_070_2048_R2.00_full-ringhalf-2.fits',
+#              100: 'HFI_SkyMap_100_2048_R2.00_full-ringhalf-2.fits',
+#              143: 'HFI_SkyMap_143_2048_R2.00_full-ringhalf-2.fits',
+#              217: 'HFI_SkyMap_217_2048_R2.00_full-ringhalf-2.fits',
+#              353: 'HFI_SkyMap_353_2048_R2.00_full-ringhalf-2.fits',
+#              545: 'HFI_SkyMap_545_2048_R2.00_full-ringhalf-2.fits',
+#              857: 'HFI_SkyMap_857_2048_R2.00_full-ringhalf-2.fits'}
 
 fname = os.path.join(datapath, "NILC_bands.txt")
 data = ascii.read(fname)
@@ -124,11 +167,11 @@ same_units = False, same_res = False):
 
     Parameters
     ----------
-	name: string array, optional
+	name: string or string array, optional
 		name of objects, will be used as file name if files are written. Default:None
-	RA: float array, optional
+	RA: float or float array array, optional
 		Right acention of objects, fk5 coordinates are required. Default:None
-	DEC: float array, optional
+	DEC: float or float array, optional
 		Declination of objects, fk5 coordinates are required. Default:None
 	allsky_map: float_array, optional
 		all-sky map in healpix ring-ordered format. To be used as source map. Default:None
@@ -166,6 +209,10 @@ same_units = False, same_res = False):
 		If out_path is set, one or several files will be written
 	'''
 
+	name = np.asarray(name)
+	RA = np.asarray(RA)
+	DEC = np.asarray(DEC)
+
 	if in_file is not None:
 		data = ascii.read(in_file)
 		name = np.array(data[:]['col1'])
@@ -180,9 +227,9 @@ same_units = False, same_res = False):
 		output = np.zeros((nclusters, npix, npix))
 		
 		if MILCA is True:
-			allsky_map = hp.fitsfunc.read_map(home + '/SSD/Planck_maps/COM_CompMap_YSZ_R2.00/milca_ymaps.fits')
+			allsky_map = hp.fitsfunc.read_map(milca_ymap)
 		if NILC is True:
-			allsky_map = hp.fitsfunc.read_map(home + '/SSD/Planck_maps/COM_CompMap_YSZ_R2.00/nilc_ymaps.fits')
+			allsky_map = hp.fitsfunc.read_map(nilc_ymap)
 
 		for i in np.arange(nclusters):
 				projected_map = hp.gnomview(allsky_map, coord=('G','C'), rot=(RA[i],DEC[i]), return_projected_map=True, xsize=npix, reso=pixel_size, no_plot=True)
@@ -196,7 +243,7 @@ same_units = False, same_res = False):
 		output = np.zeros((nclusters, nf, npix, npix))
 
 		for f in np.arange(nf):
-			file_name = planck_path + planck_maps[planck[f]]
+			file_name = planck_path + full_mission_maps[planck[f]]
 			allsky_map = hp.fitsfunc.read_map(file_name)
 			for i in np.arange(nclusters):
 				projected_map = hp.gnomview(allsky_map, coord=('G','C'), rot=(RA[i],DEC[i]), return_projected_map=True, xsize=npix, reso=pixel_size, no_plot=True)
@@ -233,7 +280,7 @@ same_units = False, same_res = False):
 	return(output)
 
 
-def ilc_windows(scales, nside, l_max = 2, silent = True):
+def ilc_windows(scales, nside, lmax = None, silent = True):
 	'''Computes allsky-ILC spatial window functions from the difference of gaussians. 
 	All scales are conserved.
 
@@ -244,9 +291,9 @@ def ilc_windows(scales, nside, l_max = 2, silent = True):
 		Have to be provided in decending order.
 	nside: array
 		Healpy nside parameter of the allsky maps.
-	l_max: int
-		Defines the maximum ell via lmax = l_max*nside - 1.
-		The maximum allowed value is 3. Default: 2
+	lmax: int, optional
+		Defines the maximum ell. The maximum allowed value is 3*nside-1. 
+		Default: 2*nside-1
 	silent: bool
 		Prints the sum of all windows as a diagnostic. All scales are conserved
 		if all numbers are 1. Default: True
@@ -256,8 +303,9 @@ def ilc_windows(scales, nside, l_max = 2, silent = True):
 	bands: 2D array
 		Spherical-Harmonic window functions to be used for spatial decomposition.
 	'''
-
-	lmax = l_max*nside-1
+	
+	if lmax is None:
+		lmax = 2*nside-1
 
 	n_scales = len(scales)+1
 	windows = np.zeros((n_scales+1, lmax+1))
@@ -431,11 +479,11 @@ def ilc(name = None, RA = None, DEC = None, in_file = None, map_size = 10, pixel
 
     Parameters
     ----------
-	name: string array, optional
-		Name of objects, will be used as file name if files are written. Default:None
-	RA: float array, optional
+	name: string or string array, optional
+		name of objects, will be used as file name if files are written. Default:None
+	RA: float or float array array, optional
 		Right acention of objects, fk5 coordinates are required. Default:None
-	DEC: float array, optional
+	DEC: float or float array, optional
 		Declination of objects, fk5 coordinates are required. Default:None
 	in_file: string, optional
 		File for batch-processing. Has to contain three columns: name, RA and DEC
@@ -480,6 +528,10 @@ def ilc(name = None, RA = None, DEC = None, in_file = None, map_size = 10, pixel
 	output: float array
 		Returns an ILC map.
 	'''
+
+	name = np.asarray(name)
+	RA = np.asarray(RA)
+	DEC = np.asarray(DEC)
 
 	if scales is not None:
 		if scales == 'default':
@@ -565,7 +617,7 @@ def ilc(name = None, RA = None, DEC = None, in_file = None, map_size = 10, pixel
 
 
 def ilc_allsky(allsky_maps = None, freq = None, nside = 2048, planck = None, decompose = None, 
-               field_nside = 2, T_e = 0, l_max = 2, tsz = True, constrained = None, cmb = False, 
+               field_nside = 2, T_e = 0, lmax = None, tsz = True, constrained = None, cmb = False, 
 					mask = None, iter = 0, ring1 = False, ring2 = False, outfile = None):
 	'''Computes an allsky-ILC map. The function was written with Planck data in mind, 
 	but can also handle synthetic data and data from future surveys. The ILC algorithm is 
@@ -599,10 +651,9 @@ def ilc_allsky(allsky_maps = None, freq = None, nside = 2048, planck = None, dec
 	T_e: float, optional
 		Electron temperature to be used for the computation of the tSZ spectrum. The temperature will
 		be assigned to the full sky, so use with caution. Default: 0
-	l_max: int, optional
-		Defines the highest ell to be used for the all-sky map processing. To be multiplied with nside.
-		healpy only supports a maximum value of 3*nside-1, so only choose either 2 or 3. Default: 2
-
+	lmax: int, optional
+		Defines the maximum ell. The maximum allowed value is 3*nside-1. 
+		Default: 2*nside-1
 	tsz: bool, optional
 		If set to True, the function will use the tSZ spectrum to return an ILC y-map. Default: True
 	cmb:
@@ -633,7 +684,9 @@ def ilc_allsky(allsky_maps = None, freq = None, nside = 2048, planck = None, dec
 	'''
 
 	npix = hp.pixelfunc.nside2npix(nside)
-	lmax = l_max*nside-1
+
+	if lmax is None:
+		lmax = 2*nside-1
 
 	if planck is not None:
 
@@ -643,11 +696,11 @@ def ilc_allsky(allsky_maps = None, freq = None, nside = 2048, planck = None, dec
 		for f in np.arange(nf):
 
 			if ring1 is True:
-				file_name = ring1_path + ring1_maps[planck[f]]
+				file_name = ring1_maps[planck[f]]
 			elif ring2 is True:
-				file_name = ring2_path + ring2_maps[planck[f]]
+				file_name = ring2_maps[planck[f]]
 			else:
-				file_name = planck_path + planck_maps[planck[f]]
+				file_name = planck_path + full_mission_maps[planck[f]]
 			allsky_map = hp.fitsfunc.read_map(file_name)
 
 			if planck[f] == 30 or planck[f] == 44:
@@ -702,7 +755,9 @@ def ilc_allsky(allsky_maps = None, freq = None, nside = 2048, planck = None, dec
 	if decompose is not None:
 
 		if decompose == 'milca':
-			windows = None
+			windows = ilc_windows(np.flip(np.array([5.0,7.50,10.0000,13.4132,18.7716,25.2406,33.2659,43.5919,57.5805,78.0786,112.465,190.082,600.0,1500.0,3600.0])), nside, silent = False, lmax = 3*nside-1)
+			windows = windows[2:-3,:]			
+			field_nside = np.array([1,2,2,2,2,4,4,4,8,8,16])
 		elif decompose == 'nilc':
 			windows = NILC_bands
 			field_nside = np.array([1,2,2,2,2,4,4,4,8,16])
