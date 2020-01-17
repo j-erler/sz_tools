@@ -723,3 +723,26 @@ def radial_profile(image, center = None, nbins = None, r_min = 0, r_max = None,
 		out = np.array([r_uniq, tbin / nr])
 		    
 	return(out)
+
+
+def rebin(image, new_shape):
+	'''Rebins a given 2D numpy array by averaging. 
+
+	Parameter-s
+	----------
+	image: 2D float array
+		Two-dimensional numpy array that is to be re-binned
+	new shape: int tuple
+		New dimensions for the provided array
+	Returns
+	-------
+	new_image: float array
+		Re-binned 2D array.
+	'''
+
+    shape = (new_shape[0], image.shape[0] // new_shape[0],
+             new_shape[1], image.shape[1] // new_shape[1])
+
+    new_image = image.reshape(shape).mean(-1).mean(1)
+
+	return(new_image)
