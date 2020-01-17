@@ -581,7 +581,7 @@ def gnfw_abel(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5.0,
 
 def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 10, 
 		     pixel_size = 1.5, dx = 0, dy = 0, interpol = 1000, fwhm = None, 
-		     r_max = 5.0, r_min = 1e-3, bins = 1000, norm_planck = False):
+		     r_max = 5.0, r_min = 1e-3, bins = 1000, norm_planck = False, oversample = None):
 	'''Computes a Compton-y map of a galaxy cluster at with mass
 	M_500 at redshift z by numerically projecting a GNFW 
 	electron pressure model.
@@ -634,7 +634,10 @@ def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 1
 	norm_planck: bool, optional
 		If set to True, the Planck Y_500 M_500 relation is
 		used to re-normalize the cluster pressure profile.
-		Default: False 
+		Default: False
+	oversample: int, optional
+		If set, the map will be oversampled by the specified factor. 
+		Odd values are recommend. Default: None
 
 	Returns
 	-------
@@ -643,6 +646,12 @@ def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 1
 	'''
 
 	npix = round(map_size*60 / pixel_size)
+
+	if oversample is not None:
+		pixel_size = pixel_size / oversample
+		npix_original = npix
+		npix = round(map_size*60 / pixel_size)
+		dx, dy = int((oversample-1) / 2), int((oversample-1) / 2)
 
 	pixel_size_meters = pixel_size/60*np.pi/180 * cosmo.angular_diameter_distance(z).si.value
 
@@ -665,10 +674,14 @@ def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 1
 		sigma = fwhm / (2*np.sqrt(2*np.log(2)))
 		cluster_map = gaussian_filter(cluster_map, sigma=sigma/pixel_size, order=0, mode='wrap', truncate=20.0)
 
+	if oversample is not None:
+		cluster_map = rebin(cluster_map, (npix_original, npix_original))
+
 	return(cluster_map)
 
 
-def simulate_cluster_beta(y_0, r_c, beta = 1, map_size = 10, pixel_size = 1.5, dx = 0, dy = 0, fwhm = None):
+def simulate_cluster_beta(y_0, r_c, beta = 1, map_size = 10, pixel_size = 1.5, dx = 0, dy = 0, 
+	fwhm = None, oversample = None):
 	'''Computes a Compton-y map of a galaxy cluster at with mass
 	M_500 at redshift z by numerically projecting a beta-model 
 	electron number density model. This is only valid is the 
@@ -695,6 +708,9 @@ def simulate_cluster_beta(y_0, r_c, beta = 1, map_size = 10, pixel_size = 1.5, d
 	fwhm: float, optional
 		FWHM of Gaussian kernel in arcmin with which the 
 		map will be convolved. Default: None
+	oversample: int, optional
+		If set, the map will be oversampled by the specified factor. 
+		Odd values are recommend. Default: None
 
 	Returns
 	-------
@@ -703,6 +719,12 @@ def simulate_cluster_beta(y_0, r_c, beta = 1, map_size = 10, pixel_size = 1.5, d
 	'''
 
 	npix = round(map_size*60 / pixel_size)
+
+	if oversample is not None:
+		pixel_size = pixel_size / oversample
+		npix_original = npix
+		npix = round(map_size*60 / pixel_size)
+		dx, dy = int((oversample-1) / 2), int((oversample-1) / 2)
 
 	YY, XX = np.indices((npix, npix))
 	center = (npix//2+dx,npix//2+dy)
@@ -713,6 +735,9 @@ def simulate_cluster_beta(y_0, r_c, beta = 1, map_size = 10, pixel_size = 1.5, d
 	if fwhm is not None:
 		sigma = fwhm / (2*np.sqrt(2*np.log(2)))
 		cluster_map = gaussian_filter(cluster_map, sigma=sigma/pixel_size, order=0, mode='wrap', truncate=20.0)
+
+	if oversample is not None:
+		cluster_map = rebin(cluster_map, (npix_original, npix_original))
 
 	return(cluster_map)
 
@@ -1159,7 +1184,7 @@ def tau_fast(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5, r_min 
 
 def simulate_rel_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 10, pixel_size = 1.5, 
 			 dx = 0, dy = 0, interpol = 1000, fwhm = None, r_max = 5, r_min = 1e-3, bins = 1000, 
-			 cool_core = True, norm_planck = False):
+			 cool_core = True, norm_planck = False, oversample = None):
 	'''Computes Compton-y, optical depth and pressure-weighted 
 	temperature maps of a galaxy cluster at with mass
 	M_500 at redshift z by numerically projecting and weighting
@@ -1224,6 +1249,9 @@ def simulate_rel_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size
 		If set to True, the Planck Y_500 M_500 relation is
 		used to re-normalize the cluster pressure profile.
 		Default: False 
+	oversample: int, optional
+		If set, the map will be oversampled by the specified factor. 
+		Odd values are recommend. Default: None
 
 	Returns
 	-------
@@ -1232,6 +1260,12 @@ def simulate_rel_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size
 	'''
 
 	npix = round(map_size*60 / pixel_size)
+
+	if oversample is not None:
+		pixel_size = pixel_size / oversample
+		npix_original = npix
+		npix = round(map_size*60 / pixel_size)
+		dx, dy = int((oversample-1) / 2), int((oversample-1) / 2)
 
 	pixel_size_meters = pixel_size/60*np.pi/180 * cosmo.angular_diameter_distance(z).si.value
 
@@ -1258,6 +1292,11 @@ def simulate_rel_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size
 		tau_map = gaussian_filter(tau_map, sigma=sigma/pixel_size, order=0, mode='wrap', truncate=10.0)
 		index = y_map > 0
 		T_map[index] = T_map[index]/y_map[index]
+
+	if oversample is not None:
+		y_map = rebin(y_map, (npix_original, npix_original))
+		tau_map = rebin(tau_map, (npix_original, npix_original))
+		T_map = rebin(T_map, (npix_original, npix_original))
 
 	cluster_maps =  np.array([y_map, tau_map, T_map])
 
