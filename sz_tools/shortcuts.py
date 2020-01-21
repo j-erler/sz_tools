@@ -7,6 +7,7 @@ from astropy.table import Table
 from scipy.optimize import curve_fit
 from astropy.constants import c, h, k_B
 from scipy.integrate import simps
+from astropy.coordinates import SkyCoord
 
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.7255)
 T_CMB = cosmo.Tcmb0.si.value
@@ -746,3 +747,59 @@ def rebin(image, new_shape):
     new_image = image.reshape(shape).mean(-1).mean(1)
 
 	return(new_image)
+
+
+def sample_sphere_uniform(n, mask = None, radec = True):
+    '''Draws uniformly sampled tuples of coordinates on the sphere. 
+	All-sky masks in the healpix format can be applied, in which case 
+	masked areas will be excluded.
+
+    Parameters
+    ----------
+    n: int
+        Number of data points to be drawn
+    mask: float array, optional
+        All-sky healpix mask. If a mask is used data points will 
+		only be drawn in areas that are not masked. Default: None
+    radec: bool
+        Determines the coordinate system of the output. If True, 
+		equatorial coordinates will be returned, i.e. RA, DEC (fk5). 
+		If False, galactic coordinates are returned. Default: True
+    Returns
+    -------
+    phi, theta
+        longitude and latitude of sampled points in equatorial or 
+		galactic coordinate system
+    '''
+    
+    if mask is None:
+        phi = 360 * np.random.random(n)
+        theta = np.arccos(2*np.random.random(n) - 1)*180/np.pi - 90
+    else:
+        nside = hp.get_nside(mask)
+
+        phi = np.zeros(n)
+        theta = np.zeros(n)
+
+        i = int(0)
+        while i < n:
+            phi_guess = 360 * np.random.random()
+            theta_guess = np.arccos(2*np.random.random() - 1)*180/np.pi - 90
+
+            index = hp.ang2pix(nside, phi_guess, theta_guess, lonlat = True)
+
+            if mask[index] != 0:
+                phi[i] = phi_guess
+                theta[i] = theta_guess
+                i += 1
+                
+    if radec is True:
+        print("output will be fk5 coordinates (RA, DEC) for the equinox J2000")
+        c = SkyCoord(phi, theta, frame='galactic', unit='deg')
+        c_fk5 = c.transform_to('fk5')
+        phi = c_fk5.ra.degree
+        theta = c_fk5.dec.degree
+    else:
+        print("output will be galactic coordinates (glon, glat)")
+
+    return(phi, theta)
