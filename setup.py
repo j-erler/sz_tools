@@ -11,7 +11,7 @@ if sys.argv[-1] == "publish":
 
 setup(
     name="sz_tools",
-    version="1.0",
+    version="1.1",
     author="Jens Erler",
     author_email="jens@astro.uni-bonn.de",
     packages=["sz_tools"],
