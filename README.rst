@@ -40,7 +40,7 @@ The BibTeX entry for the paper is::
 License
 -------
 
-Copyright 2018 Jens Erler.
+Copyright 2020 Jens Erler.
 
 sz_tools is free software made available under the MIT License. For details see
 the LICENSE file.
