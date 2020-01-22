@@ -1259,7 +1259,7 @@ def simulate_rel_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size
 		3D array containing the simulated y-map, tau-map and T_SZ-map.
 	'''
 
-	npix = round(map_size*60 / pixel_size)
+  npix = round(map_size*60 / pixel_size)
 
 	if oversample is not None:
 		pixel_size = pixel_size / oversample
