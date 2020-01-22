@@ -729,12 +729,13 @@ def radial_profile(image, center = None, nbins = None, r_min = 0, r_max = None,
 def rebin(image, new_shape):
 	'''Rebins a given 2D numpy array by averaging. 
 
-	Parameter-s
+	Parameters
 	----------
 	image: 2D float array
 		Two-dimensional numpy array that is to be re-binned
 	new shape: int tuple
 		New dimensions for the provided array
+
 	Returns
 	-------
 	new_image: float array
@@ -765,6 +766,7 @@ def sample_sphere_uniform(n, mask = None, radec = True):
 		Determines the coordinate system of the output. If True, 
 		equatorial coordinates will be returned, i.e. RA, DEC (fk5). 
 		If False, galactic coordinates are returned. Default: True
+
 	Returns
 	-------
 	phi, theta
