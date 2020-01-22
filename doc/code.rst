@@ -102,3 +102,5 @@ wrappers
    convert_units
    angle
    radial_profile
+   rebin
+   sample_sphere_uniform
