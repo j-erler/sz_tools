@@ -783,7 +783,7 @@ def sample_sphere_uniform(n, mask = None, radec = True):
 
 		i = int(0)
 		while i < n:
-	    	phi_guess = 360 * np.random.random()
+	    		phi_guess = 360 * np.random.random()
 			theta_guess = np.arccos(2*np.random.random() - 1)*180/np.pi - 90
 
 			index = hp.ang2pix(nside, phi_guess, theta_guess, lonlat = True)
