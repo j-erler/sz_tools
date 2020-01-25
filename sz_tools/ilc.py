@@ -243,7 +243,7 @@ same_units = False, same_res = False):
 		output = np.zeros((nclusters, nf, npix, npix))
 
 		for f in np.arange(nf):
-			file_name = planck_path + full_mission_maps[planck[f]]
+			file_name = full_mission_path + full_mission_maps[planck[f]]
 			allsky_map = hp.fitsfunc.read_map(file_name)
 			for i in np.arange(nclusters):
 				projected_map = hp.gnomview(allsky_map, coord=('G','C'), rot=(RA[i],DEC[i]), return_projected_map=True, xsize=npix, reso=pixel_size, no_plot=True)
@@ -700,7 +700,7 @@ def ilc_allsky(allsky_maps = None, freq = None, nside = 2048, planck = None, dec
 			elif ring2 is True:
 				file_name = ring2_maps[planck[f]]
 			else:
-				file_name = planck_path + full_mission_maps[planck[f]]
+				file_name = full_mission_path + full_mission_maps[planck[f]]
 			allsky_map = hp.fitsfunc.read_map(file_name)
 
 			if planck[f] == 30 or planck[f] == 44:
