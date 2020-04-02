@@ -259,7 +259,7 @@ same_units = False, same_res = False):
 
 				if same_res is True and f != 0:
 					kernel = np.sqrt(sz.planck_beams(planck[0])**2 - sz.planck_beams(planck[f])**2)
-					print(sz.planck_beams(planck[0]), sz.planck_beams(planck[f]), kernel*fwhm2sigma/pixel_size)
+					#print(sz.planck_beams(planck[0]), sz.planck_beams(planck[f]), kernel*fwhm2sigma/pixel_size)
 					projected_map = ndimage.gaussian_filter(projected_map, sigma=kernel*fwhm2sigma/pixel_size, order=0, mode = "reflect", truncate = 10)
 
 				output[i,f,:,:] = projected_map
