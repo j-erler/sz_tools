@@ -1289,8 +1289,8 @@ def simulate_rel_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size
 	r_interpol = np.linspace(np.min(r), np.max(r), interpol)
 
 	y_interpol = gnfw_projected_fast(r_interpol, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, norm_planck=norm_planck)
-	T_interpol = T_sz_fast(r_interpol, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, cool_core = cool_core)
-	tau_interpol = tau_fast(r_interpol, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, cool_core = cool_core)
+	T_interpol = T_sz_fast(r_interpol, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, cool_core = cool_core, Tx = Tx)
+	tau_interpol = tau_fast(r_interpol, z, M_500, p, alpha_p_prime=alpha_p_prime, r_max=r_max, r_min=r_min, bins=bins, cool_core = cool_core, Tx = Tx)
 	
 	y_map = np.interp(r, r_interpol, y_interpol).reshape(npix,npix)
 	T_map = np.interp(r, r_interpol, T_interpol).reshape(npix,npix)
