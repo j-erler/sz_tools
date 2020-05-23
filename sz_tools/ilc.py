@@ -219,7 +219,7 @@ same_units = False, same_res = False):
 		RA = np.array(data[:]['col2'])
 		DEC = np.array(data[:]['col3'])
 
-	npix = int(map_size*60 / pixel_size)
+	npix = np.int(round(map_size*60 / pixel_size))
 	nclusters = len(name)
 
 	if planck is None:
