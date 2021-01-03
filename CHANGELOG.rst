@@ -1,3 +1,7 @@
+Update 04 Jan 2020
+
+* Changes to ilc_allsky() to allow easy usage of costom spectra
+
 Release 1.1 22nd Jan 2020
 
 * Adds oversample keyword to simulate_clusters() and simulate_rel_cluster()
