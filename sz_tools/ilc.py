@@ -617,186 +617,191 @@ def ilc(name = None, RA = None, DEC = None, in_file = None, map_size = 10, pixel
 
 
 def ilc_allsky(allsky_maps = None, freq = None, nside = 2048, planck = None, decompose = None, 
-               field_nside = 2, T_e = 0, lmax = None, tsz = True, constrained = None, cmb = False, 
-					mask = None, iter = 0, ring1 = False, ring2 = False, outfile = None):
-	'''Computes an allsky-ILC map. The function was written with Planck data in mind, 
-	but can also handle synthetic data and data from future surveys. The ILC algorithm is 
-	written is pixel space and thus all maps have to be smoothed to the same spatial resolution. 
-	The result can be improved by spatialy decomposing the input maps and running the ILC 
-	algorithm on each spatial scale separatly. For this, several modes are available, some of 
-	which use spatial bands of the MILCA and NILC algorithms of the Planck collaboration.
-
+               field_nside = 2, T_e = 0, lmax = None, spec = "tSZ", constrained = None, 
+                    mask = None, iter = 0, ring1 = False, ring2 = False, outfile = None):
+    '''Computes an allsky-ILC map. The function was written with Planck data in mind, 
+    but can also handle synthetic data and data from future surveys. The ILC algorithm is 
+    written is pixel space and thus all maps have to be smoothed to the same spatial resolution. 
+    The result can be improved by spatialy decomposing the input maps and running the ILC 
+    algorithm on each spatial scale separatly. For this, several modes are available, some of 
+    which use spatial bands of the MILCA and NILC algorithms of the Planck collaboration.
     Parameters
     ----------
-	allsky_maps: float array, optional
-		A n_freq x n_pix array containing all-sky maps in different frequency bands.
-		All maos have to be given at the same spatial resolution. Default: None
-	freq: float array, optional
-		An array specifying the frequency bands of the input maps. Default: None
-	nside: array, optional
-		Healpy nside parameter of the allsky maps. Default: 2048
-	planck: int array, optional
-		List of Planck bands in GHz to be used as source files. Default:None
-	decompose: float array or string, optional
-		Defines the gaussian windows to be used to spatially decompose the the all-sky maps.
-		The windows are computed from the difference of pairs of gaussians, the FWHMs in arcmin
-		of which are specified here. Besides giving an array of values for the FWHMs, setting 
-		decompose to 'default', 'NILC' or 'MILCA' uses pre-fefind windows. Default: None
-	field_nside: int array, optional
-		Defines the number of fields the sky will be tesselated in for the computation of the
-		covariance matrix. This is done using the healpy nested pixel-indexing scheme. 
-		The values have the be valid healpy nside parameters. In case spatial decomposition is used, 
-		the number of field_nsides has to be n_scales+1. If one of the pre-defined modes for the
-		decomposition is used field_nside will be assigned automatically. Default: 2
-	T_e: float, optional
-		Electron temperature to be used for the computation of the tSZ spectrum. The temperature will
-		be assigned to the full sky, so use with caution. Default: 0
-	lmax: int, optional
-		Defines the maximum ell. The maximum allowed value is 3*nside-1. 
-		Default: 2*nside-1
-	tsz: bool, optional
-		If set to True, the function will use the tSZ spectrum to return an ILC y-map. Default: True
-	cmb:
-		If set to True, the function will use the cmb spectrum to return a CMB map. Default: False
-	constrained: string or float array, optional
-		Additional spectral constraints for the ILC algorithm. If set to 'cmb', the cmb spectrum will
-		be used to minimize cmb residuals. Choosing 'tsz' will remove tSZ residuals. Alternatively, 
-		constrained can be a float array containing an arbitrary SED.
-	mask: array, optional
-		Flattened data mask. The mask will be used during the computation
-		of the data covariance matrix and later applied to the output
-	iter: int, optional
-		Number if iterations to be used while processing the all-sky maps.
-		Higher values will reduce numerical errors. Healpy default is 3.
-		Default: 0
-	ring1: bool, optional
-		If set to True, the Planck Ringhalf1 maps are used as input: Default: False	
-	ring2: bool, optional
-		If set to True, the Planck Ringhalf1 maps are used as input: Default: False	
-	outfile: sting, optional
-		Path and file name for data output. The output will be stored as a healpy .fits file.
-		Default: None
-
+    allsky_maps: float array, optional
+        A n_freq x n_pix array containing all-sky maps in different frequency bands.
+        All maps have to be given at the same units and spatial resolution. Default: None
+    freq: float array, optional
+        An array specifying the frequency bands of the input maps. Default: None
+    nside: array, optional
+        Healpy nside parameter of the allsky maps. Default: 2048
+    planck: int array, optional
+        List of Planck bands in GHz to be used as source files. Default:None
+    decompose: float array or string, optional
+        Defines the gaussian windows to be used to spatially decompose the the all-sky maps.
+        The windows are computed from the difference of pairs of gaussians, the FWHMs in arcmin
+        of which are specified here. Besides giving an array of values for the FWHMs, setting 
+        decompose to 'default', 'NILC' or 'MILCA' uses pre-fefind windows. Default: None
+    field_nside: int array, optional
+        Defines the number of fields the sky will be tesselated in for the computation of the
+        covariance matrix. This is done using the healpy nested pixel-indexing scheme. 
+        The values have the be valid healpy nside parameters. In case spatial decomposition is used, 
+        the number of field_nsides has to be n_scales+1. If one of the pre-defined modes for the
+        decomposition is used field_nside will be assigned automatically. Default: 2
+    T_e: float, optional
+        Electron temperature to be used for the computation of the tSZ spectrum. The temperature will
+        be assigned to the full sky, so use with caution. Default: 0
+    lmax: int, optional
+        Defines the maximum ell. The maximum allowed value is 3*nside-1. 
+        Default: 2*nside-1
+    spec: numpy array or string
+        Mixing vector of the desired component or mixing matrix of all constrained components. In
+        the latter case, the numpy array must be of shape (nc, nfreq), where nc is the number of
+        components while nfreq is the number of observed frequencies. If spec is set to "tSZ" or "CMB"
+        the spectrum of the tSZ effect or the CMB will be used as the mixing vector. Default: "tSZ"
+    constrained: string or float array, optional
+        Desired resonce of the ILC weights to the components of the mixing matrix. The input has to 
+        be a numpy array of length nc, where nc is the number of constrained components. Desired 
+        components have a resonse of 1, while 0 is assigned to unwanted components. If set to 'cmb', 
+        the cmb spectrum will be used to minimize cmb residuals. Choosing 'tsz' will remove tSZ residuals. 
+        Alternatively, constrained can be a float array containing an arbitrary SED.
+    mask: array, optional
+        Flattened data mask. The mask will be used during the computation
+        of the data covariance matrix and later applied to the output
+    iter: int, optional
+        Number if iterations to be used while processing the all-sky maps.
+        Higher values will reduce numerical errors. Healpy default is 3.
+        Default: 0
+    ring1: bool, optional
+        If set to True, the Planck Ringhalf1 maps are used as input: Default: False	
+    ring2: bool, optional
+        If set to True, the Planck Ringhalf1 maps are used as input: Default: False	
+    outfile: sting, optional
+        Path and file name for data output. The output will be stored as a healpy .fits file.
+        Default: None
     Returns
     -------
-	output: float array
-		Returns a ILC all-sky map in the healpy format.
-	'''
+    output: float array
+        Returns a ILC all-sky map in the healpy format.
+    '''
 
-	npix = hp.pixelfunc.nside2npix(nside)
+    npix = hp.pixelfunc.nside2npix(nside)
 
-	if lmax is None:
-		lmax = 2*nside-1
+    if lmax is None:
+        lmax = 2*nside-1
 
-	if planck is not None:
+    if planck is not None:
 
-		nf = len(planck)
-		allsky_maps = np.zeros((nf,npix))
+        nf = len(planck)
+        allsky_maps = np.zeros((nf,npix))
 
-		for f in np.arange(nf):
+        for f in np.arange(nf):
 
-			if ring1 is True:
-				file_name = ring1_maps[planck[f]]
-			elif ring2 is True:
-				file_name = ring2_maps[planck[f]]
-			else:
-				file_name = full_mission_path + full_mission_maps[planck[f]]
-			allsky_map = hp.fitsfunc.read_map(file_name)
+            if ring1 is True:
+                file_name = ring1_maps[planck[f]]
+            elif ring2 is True:
+                file_name = ring2_maps[planck[f]]
+            else:
+                file_name = full_mission_path + full_mission_maps[planck[f]]
+            allsky_map = hp.fitsfunc.read_map(file_name)
 
-			if planck[f] == 30 or planck[f] == 44:
-				allsky_map = hp.pixelfunc.ud_grade(allsky_map, nside, order_in = 'RING')
+            if planck[f] == 30 or planck[f] == 44:
+                allsky_map = hp.pixelfunc.ud_grade(allsky_map, nside, order_in = 'RING')
 
-			if planck[f] == 545:
-				allsky_map /= sz.planck_uc(545)
-	
-			if planck[f] == 857:
-				allsky_map /= sz.planck_uc(857)
+            if planck[f] == 545:
+                allsky_map /= sz.planck_uc(545)
 
-			if f != 0:
-				print("Smoothing map:", planck[f])
-				kernel = np.sqrt(sz.planck_beams(planck[0])**2 - sz.planck_beams(planck[f])**2) / 60 * np.pi/180
-				allsky_map = hp.sphtfunc.smoothing(allsky_map, fwhm = kernel, iter = iter, lmax = lmax)
-			
-			if decompose is None:
-				allsky_maps[f,:] = hp.pixelfunc.reorder(allsky_map, r2n = True)
-			else:
-				allsky_maps[f,:] = allsky_map
+            if planck[f] == 857:
+                allsky_map /= sz.planck_uc(857)
 
-		del allsky_map
+            if f != 0:
+                print("Smoothing map:", planck[f])
+                kernel = np.sqrt(sz.planck_beams(planck[0])**2 - sz.planck_beams(planck[f])**2) / 60 * np.pi/180
+                allsky_map = hp.sphtfunc.smoothing(allsky_map, fwhm = kernel, iter = iter, lmax = lmax)
 
-	else:
-		nf = len(freq)
+            if decompose is None:
+                allsky_maps[f,:] = hp.pixelfunc.reorder(allsky_map, r2n = True)
+            else:
+                allsky_maps[f,:] = allsky_map
 
-	if tsz is True:
-		if planck is not None:
-			spectrum = sz.tsz_spec_planck(planck, 1, T_e = T_e)
-		else:
-			spectrum = sz.tsz_spec(freq, 1, T_e = T_e)
-	if cmb is True:
-		spectrum = np.ones(nf)
+        del allsky_map
 
-	if constrained is not None:
-		if constrained == 'cmb' or constrained == 'CMB':
-			F = np.array([spectrum, np.ones(nf)])
-		elif constrained == 'tsz' or constrained == 'tSZ':
-			if planck is not None:
-				F = np.array([spectrum, sz.tsz_spec_planck(planck, 1, T_e = T_e)])
-			else:
-				F = np.array([spectrum, sz.tsz_spec(freq, 1, T_e = T_e)])
-		else:
-			F = np.concatenate([spectrum.reshape(1,nf), constrained])
-		responce = np.concatenate([np.ones((1)), np.zeros((F.shape[0]-1))])
-	else:
-		F = np.array(spectrum)
-		responce = None
+    else:
+        nf = allsky_maps.shape[0]
+        
+    if spec == "tSZ" or spec == "tsz":
+        if planck is not None:
+            spectrum = sz.tsz_spec_planck(planck, 1, T_e = T_e)
+        else:
+            spectrum = sz.tsz_spec(freq, 1, T_e = T_e)
+    elif spec == "CMB" or spec == "cmb":
+        spectrum = np.ones(nf)
+    else:
+        spectrum = np.array(spec)
 
-	output = np.zeros(npix)
+    if constrained is not None:
+        if constrained == 'cmb' or constrained == 'CMB':
+            response = np.array([1,0])
+            F = np.array([spectrum, np.ones(nf)])
+        elif constrained == 'tsz' or constrained == 'tSZ':
+            response = np.array([1,0])
+            if planck is not None:
+                F = np.array([spectrum, sz.tsz_spec_planck(planck, 1, T_e = T_e)])
+            else:
+                F = np.array([spectrum, sz.tsz_spec(freq, 1, T_e = T_e)])
+        else:
+            F = spectrum
+            response = np.array(constrained)
+    else:
+        F = np.array(spectrum)
+        response = None
+        
+    output = np.zeros(npix)
 
-	if decompose is not None:
+    if decompose is not None:
 
-		if decompose == 'milca':
-			windows = ilc_windows(np.flip(np.array([5.0,7.50,10.0000,13.4132,18.7716,25.2406,33.2659,43.5919,57.5805,78.0786,112.465,190.082,600.0,1500.0,3600.0])), nside, silent = False, lmax = 3*nside-1)
-			windows = windows[2:-3,:]			
-			field_nside = np.array([1,2,2,2,2,4,4,4,8,8,16])
-		elif decompose == 'nilc':
-			windows = NILC_bands
-			field_nside = np.array([1,2,2,2,2,4,4,4,8,16])
-		elif decompose == 'default':
-			scales = np.array([1280,640,320,160,80,40,20,10,5])
-			windows = ilc_windows(scales, nside, silent = True)
-			field_nside = np.array([2,2,2,2,2,2,2,2,2,2])
-		else:
-			windows = ilc_windows(decompose, nside, silent = True)
+        if decompose == 'milca':
+            windows = ilc_windows(np.flip(np.array([5.0,7.50,10.0000,13.4132,18.7716,25.2406,33.2659,43.5919,57.5805,78.0786,112.465,190.082,600.0,1500.0,3600.0])), nside, silent = False, lmax = 3*nside-1)
+            windows = windows[2:-3,:]
+            field_nside = np.array([1,2,2,2,2,4,4,4,8,8,16])
+        elif decompose == 'nilc':
+            windows = NILC_bands
+            field_nside = np.array([1,2,2,2,2,4,4,4,8,16])
+        elif decompose == 'default':
+            scales = np.array([1280,640,320,160,80,40,20,10,5])
+            windows = ilc_windows(scales, nside, silent = True)
+            field_nside = np.array([2,2,2,2,2,2,2,2,2,2])
+        else:
+            windows = ilc_windows(decompose, nside, silent = True)
 
-		n_scales = windows.shape[0]
-		filtered_maps = np.zeros((nf, npix))
+        n_scales = windows.shape[0]
+        filtered_maps = np.zeros((nf, npix))
 
-		for i in np.arange(n_scales):
-			for j in np.arange(nf):
-				filtered_maps[j,:] = hp.pixelfunc.reorder(hp.sphtfunc.smoothing(allsky_maps[j,:], beam_window = windows[i,:], iter = iter, lmax = lmax), r2n = True)
-			
-			nfields = hp.pixelfunc.nside2npix(field_nside[i])
-			pix_per_field = int(npix/nfields)
-			fields = np.arange(0, nfields+1) * pix_per_field
+        for i in np.arange(n_scales):
+            for j in np.arange(nf):
+                filtered_maps[j,:] = hp.pixelfunc.reorder(hp.sphtfunc.smoothing(allsky_maps[j,:], beam_window = windows[i,:], iter = iter, lmax = lmax), r2n = True)
 
-			for k in np.arange(nfields):
-				ilc_result = run_ilc(filtered_maps[:,fields[k]:fields[k+1]], F, e = responce, mask = mask)
-				ilc_result = remove_offset(ilc_result, median = True)	
-				output[fields[k]:fields[k+1]] += ilc_result
+            nfields = hp.pixelfunc.nside2npix(field_nside[i])
+            pix_per_field = int(npix/nfields)
+            fields = np.arange(0, nfields+1) * pix_per_field
 
-	else:
-		nfields = hp.pixelfunc.nside2npix(field_nside)
-		pix_per_field = int(npix/nfields)
-		fields = np.arange(0, nfields+1) * pix_per_field
+            for k in np.arange(nfields):
+                ilc_result = run_ilc(filtered_maps[:,fields[k]:fields[k+1]], F, e = response, mask = mask)
+                ilc_result = remove_offset(ilc_result, median = True)	
+                output[fields[k]:fields[k+1]] += ilc_result
 
-		for k in np.arange(nfields):
-			ilc_result = run_ilc(allsky_maps[:, fields[k]:fields[k+1]], F, e = responce, mask = mask)
-			ilc_result = remove_offset(ilc_result, median = True)	
-			output[fields[k]:fields[k+1]] += ilc_result
-	
-	output = np.float32(hp.pixelfunc.reorder(output, n2r = True))
+    else:
+        nfields = hp.pixelfunc.nside2npix(field_nside)
+        pix_per_field = int(npix/nfields)
+        fields = np.arange(0, nfields+1) * pix_per_field
 
-	if outfile is not None:
-		hp.fitsfunc.write_map(outfile, output, overwrite = True)
+        for k in np.arange(nfields):
+            ilc_result = run_ilc(allsky_maps[:, fields[k]:fields[k+1]], F, e = response, mask = mask)
+            ilc_result = remove_offset(ilc_result, median = True)	
+            output[fields[k]:fields[k+1]] += ilc_result
 
-	return(output)
+    output = np.float32(hp.pixelfunc.reorder(output, n2r = True))
+
+    if outfile is not None:
+        hp.fitsfunc.write_map(outfile, output, overwrite = True)
+
+    return(output)
