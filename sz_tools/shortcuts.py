@@ -726,36 +726,6 @@ def radial_profile(image, center = None, nbins = None, r_min = 0, r_max = None,
 	return(out)
 
 
-def rebin(image, new_shape, sum = False):
-	'''Rebins a given 2D numpy array by averaging. 
-
-	Parameters
-	----------
-	image: 2D float array
-		Two-dimensional numpy array that is to be re-binned
-	new shape: int tuple
-		New dimensions for the provided array
-	sum: bool
-		If True, the rebinning the map will conserve the total of the data
-		Default: False
-
-	Returns
-	-------
-	new_image: float array
-		Re-binned 2D array.
-	'''
-
-	shape = (new_shape[0], image.shape[0] // new_shape[0],
-		 new_shape[1], image.shape[1] // new_shape[1])
-
-	if sum is False:
-		new_image = image.reshape(shape).mean(-1).mean(1)
-	else:
-		new_image = image.reshape(shape).sum(-1).sum(1)
-
-	return(new_image)
-
-
 def sample_sphere_uniform(n, mask = None, radec = True):
 	'''Draws uniformly sampled tuples of coordinates on the sphere. 
 	All-sky masks in the healpix format can be applied, in which case 
