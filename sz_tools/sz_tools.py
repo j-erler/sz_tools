@@ -1431,3 +1431,33 @@ def m200m500(c, delta = 500):
 	ratio = (200*r_200**3)/(delta)
 
 	return(ratio)
+
+
+def rebin(image, new_shape, sum = False):
+	'''Rebins a given 2D numpy array by averaging. 
+
+	Parameters
+	----------
+	image: 2D float array
+		Two-dimensional numpy array that is to be re-binned
+	new shape: int tuple
+		New dimensions for the provided array
+	sum: bool
+		If True, the rebinning the map will conserve the total of the data
+		Default: False
+
+	Returns
+	-------
+	new_image: float array
+		Re-binned 2D array.
+	'''
+
+	shape = (new_shape[0], image.shape[0] // new_shape[0],
+		 new_shape[1], image.shape[1] // new_shape[1])
+
+	if sum is False:
+		new_image = image.reshape(shape).mean(-1).mean(1)
+	else:
+		new_image = image.reshape(shape).sum(-1).sum(1)
+
+	return(new_image)
