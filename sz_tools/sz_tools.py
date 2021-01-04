@@ -580,7 +580,7 @@ def gnfw_abel(r, z, M_500, p = "Arnaud", alpha_p_prime = False, r_max = 5.0,
 
 
 def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 10, 
-		     pixel_size = 1.5, dx = 0, dy = 0, interpol = 1000, fwhm = None, 
+		     pixel_size = 1.5, dx = 0, dy = 0, center = None, interpol = 1000, fwhm = None, 
 		     r_max = 5.0, r_min = 1e-3, bins = 1000, norm_planck = False, oversample = None):
 	'''Computes a Compton-y map of a galaxy cluster at with mass
 	M_500 at redshift z by numerically projecting a GNFW 
@@ -614,6 +614,9 @@ def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 1
 	dy: float, optional
 		Offset of cluster center from image center along 
 		y-axis in pixels. Default: 0
+	center: 2D numpy array, optional
+		Cluster center in pixel coordinates. Overwrites dx and dy.
+		Default: None
 	interpol: int, optional
 		Number of bins used for the computation of the initial 
 		y-profile. The pixel values of the map are then obtained 
@@ -656,7 +659,8 @@ def simulate_cluster(M_500, z, p = "Arnaud", alpha_p_prime = False, map_size = 1
 	pixel_size_meters = pixel_size/60*np.pi/180 * cosmo.angular_diameter_distance(z).si.value
 
 	YY, XX = np.indices((npix, npix))
-	center = (npix//2+dx,npix//2+dy)
+	if center is None:
+		center = (npix//2+dx,npix//2+dy)
 	r = np.sqrt((XX-center[0])**2 + (YY-center[1])**2)*pixel_size_meters
 
 	r = r.reshape(npix*npix)
